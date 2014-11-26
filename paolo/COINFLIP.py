@@ -22,12 +22,14 @@ class CP_Parser :
     @staticmethod
     def parse_code(code) :
         tokens = CP_Parser.tokenize(code)
+        print tokens
         program = []
         i = 0
         j = 0
         while j < len(tokens) :
-            if j == ';' :
-                program.append(CP_Parser.parse_decl(tokens[i:j-1]))
+            if tokens[j] == ';' :
+                print "DECL: {}".format(str(tokens[i:j]))
+                program.append(CP_Parser.parse_decl(tokens[i:j]))
                 i = j + 1
             j += 1
 
@@ -35,10 +37,11 @@ class CP_Parser :
             
     @staticmethod
     def parse_decl(tokens) :
-        if tokens[0] != 'IF' or tokens[-2] != 'THEN' :
+        if tokens[0] != 'IF' or not 'THEN' in tokens :
             raise CP_Exception("Incorrect declaration")
-        cond =  CP_Parser.parse_cond(tokens[1:-2])
-        action = CP_Parser.parse_action(tokens[-1])
+        then_pos = tokens.index('THEN')
+        cond =  CP_Parser.parse_cond(tokens[1:then_pos])
+        action = CP_Parser.parse_action(tokens[then_pos+1:])
         return cond,action
     
     @staticmethod
@@ -100,3 +103,10 @@ class CP_Parser :
         else :
             raise CP_Exception("Incorrect action")
 
+
+
+if __name__ == '__main__' :
+    from sys import argv 
+    with open(argv[1],'r') as f :
+        program = f.read()
+    print CP_Parser.parse_code(program)
