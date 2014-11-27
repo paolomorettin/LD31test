@@ -1,0 +1,13 @@
+
+cose importanti:
+- memoria dei bot
+
+modalita':
+- team DM
+- difendi la base / cattura qualcosa
+
+altro:
+- dispositivo per mettere/togliere mine
+- radar di prossimita' nemici
+- qualcosa per far comunicare i robottini dello stesso team (tipo pi-calculus <-- wawawawawaw)
+- muri distruttibiliii, lava, acido, formaggia
