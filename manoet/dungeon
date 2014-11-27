@@ -1,0 +1,89 @@
+#!/usr/bin/python2
+
+import os, sys
+import pygame
+
+
+class Colors(object):
+
+    @staticmethod
+    def get(color):
+        return pygame.color.THECOLORS[color]
+
+class Map(object):
+
+    def __init__(self, map_file):
+        self.walls = []
+        self.floor = pygame.Rect(0, 0, 200, 200)
+        with open(map_file, 'r') as fin:
+            for line_idx, line in enumerate(fin.readlines()):
+                for col_idx, col in enumerate(line):
+                    left = col_idx * 20
+                    top = line_idx * 20
+                    if col == 'w':
+                        self.walls.append(pygame.Rect(left, top, 20, 20))
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, Colors.get("black"), self.floor)
+        for wall in self.walls:
+            pygame.draw.rect(screen, Colors.get("brown"), wall)
+
+
+class Player(object):
+
+    def __init__(self, posx, posy):
+        self.sprite = pygame.Rect(posx+2, posy+2, 16, 16)
+        self.shiftx = 0
+        self.shifty = 0
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, Colors.get("red"), self.sprite)
+
+    def move(self, key):
+        if key == pygame.K_DOWN:
+            self.shiftx = 0
+            self.shifty = 20
+        elif key == pygame.K_UP:
+            self.shiftx = 0
+            self.shifty = -20
+        elif key == pygame.K_RIGHT:
+            self.shiftx = 20
+            self.shifty = 0
+        elif key == pygame.K_LEFT:
+            self.shiftx = -20
+            self.shifty = 0
+        self.sprite.move_ip(self.shiftx, self.shifty)
+
+    def restore_position(self):
+        self.sprite.move_ip(-self.shiftx, -self.shifty)
+        self.shiftx = 0
+        self.shifty = 0
+
+class Game(object):
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((600, 400))
+        pygame.display.set_caption("Dungeon")
+
+    def run(self, map_file):
+        level = Map(map_file)
+        player = Player(20, 20)
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return
+                if event.type == pygame.KEYDOWN:
+                    player.move(event.key)
+                    # check for collisions
+                    if player.sprite.collidelist(level.walls) != -1:
+                        player.restore_position()
+
+            level.draw(self.screen)
+            player.draw(self.screen)
+            pygame.display.update()
+
+
+if __name__ == "__main__":
+    the_game = Game()   # and yes, you just lost!
+    the_game.run("maps/lv01")
