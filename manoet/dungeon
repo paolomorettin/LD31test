@@ -18,7 +18,6 @@ class Map(object):
 
     def __init__(self, map_file):
         self.walls = []
-        self.floor = pygame.Rect(0, 0, 10 * BLOCK_SIZE, 10 * BLOCK_SIZE)
         self.wall_sprite = pygame.image.load('img/wall.jpg')
         with open(map_file, 'r') as fin:
             for line_idx, line in enumerate(fin.readlines()):
@@ -28,11 +27,15 @@ class Map(object):
                     if col == 'w':
                         self.walls.append(pygame.Rect(left, top, BLOCK_SIZE,
                                                       BLOCK_SIZE))
+                    elif col == 'e':
+                        self.end = pygame.Rect(left, top, BLOCK_SIZE,
+                                               BLOCK_SIZE)
 
     def draw(self, screen):
         screen.fill(Colors.get('grey'))
         for wall in self.walls:
             screen.blit(self.wall_sprite, wall)
+        pygame.draw.rect(screen, Colors.get("green"), self.end)
 
 
 class Player(object):
@@ -76,6 +79,7 @@ class Game(object):
     def run(self, map_file):
         level = Map(map_file)
         player = Player(BLOCK_SIZE, BLOCK_SIZE)
+        text_rect = None
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -86,8 +90,15 @@ class Game(object):
                     # check for collisions
                     if player.rect.collidelist(level.walls) != -1:
                         player.restore_position()
+                    if player.rect.colliderect(level.end):
+                        font = pygame.font.Font('fonts/Vtks_Rash.ttf', 30)
+                        text_obj = font.render("You win", True, Colors.get("green"), Colors.get("blue"))
+                        text_rect = text_obj.get_rect()
+                        text_rect.center = (60, 60)
 
             level.draw(self.screen)
+            if text_rect:
+                self.screen.blit(text_obj, text_rect)
             player.draw(self.screen)
             pygame.display.update()
 
