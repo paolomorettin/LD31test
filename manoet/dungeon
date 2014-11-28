@@ -3,6 +3,10 @@
 import os, sys
 import pygame
 
+BLOCK_SIZE = 30
+PLAYER_SIZE = 22
+PLAYER_OFFSET = (BLOCK_SIZE - PLAYER_SIZE) / 2
+
 
 class Colors(object):
 
@@ -14,48 +18,52 @@ class Map(object):
 
     def __init__(self, map_file):
         self.walls = []
-        self.floor = pygame.Rect(0, 0, 200, 200)
+        self.floor = pygame.Rect(0, 0, 10 * BLOCK_SIZE, 10 * BLOCK_SIZE)
+        self.wall_sprite = pygame.image.load('img/wall.jpg')
         with open(map_file, 'r') as fin:
             for line_idx, line in enumerate(fin.readlines()):
                 for col_idx, col in enumerate(line):
-                    left = col_idx * 20
-                    top = line_idx * 20
+                    left = col_idx * BLOCK_SIZE
+                    top = line_idx * BLOCK_SIZE
                     if col == 'w':
-                        self.walls.append(pygame.Rect(left, top, 20, 20))
+                        self.walls.append(pygame.Rect(left, top, BLOCK_SIZE,
+                                                      BLOCK_SIZE))
 
     def draw(self, screen):
-        pygame.draw.rect(screen, Colors.get("black"), self.floor)
+        screen.fill(Colors.get('grey'))
         for wall in self.walls:
-            pygame.draw.rect(screen, Colors.get("brown"), wall)
+            screen.blit(self.wall_sprite, wall)
 
 
 class Player(object):
 
     def __init__(self, posx, posy):
-        self.sprite = pygame.Rect(posx+2, posy+2, 16, 16)
+        self.sprite = pygame.image.load('img/Mario.gif')
+        self.rect = pygame.Rect(posx + PLAYER_OFFSET, posy + PLAYER_OFFSET,
+                                  PLAYER_SIZE, PLAYER_SIZE)
         self.shiftx = 0
         self.shifty = 0
 
     def draw(self, screen):
-        pygame.draw.rect(screen, Colors.get("red"), self.sprite)
+        screen.blit(self.sprite, self.rect)
 
     def move(self, key):
         if key == pygame.K_DOWN:
             self.shiftx = 0
-            self.shifty = 20
+            self.shifty = BLOCK_SIZE
         elif key == pygame.K_UP:
             self.shiftx = 0
-            self.shifty = -20
+            self.shifty = -BLOCK_SIZE
         elif key == pygame.K_RIGHT:
-            self.shiftx = 20
+            self.shiftx = BLOCK_SIZE
             self.shifty = 0
         elif key == pygame.K_LEFT:
-            self.shiftx = -20
+            self.shiftx = -BLOCK_SIZE
             self.shifty = 0
-        self.sprite.move_ip(self.shiftx, self.shifty)
+        self.rect.move_ip(self.shiftx, self.shifty)
 
     def restore_position(self):
-        self.sprite.move_ip(-self.shiftx, -self.shifty)
+        self.rect.move_ip(-self.shiftx, -self.shifty)
         self.shiftx = 0
         self.shifty = 0
 
@@ -67,7 +75,7 @@ class Game(object):
 
     def run(self, map_file):
         level = Map(map_file)
-        player = Player(20, 20)
+        player = Player(BLOCK_SIZE, BLOCK_SIZE)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -76,7 +84,7 @@ class Game(object):
                 if event.type == pygame.KEYDOWN:
                     player.move(event.key)
                     # check for collisions
-                    if player.sprite.collidelist(level.walls) != -1:
+                    if player.rect.collidelist(level.walls) != -1:
                         player.restore_position()
 
             level.draw(self.screen)
