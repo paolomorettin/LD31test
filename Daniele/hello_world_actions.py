@@ -18,16 +18,28 @@ import math
 
 import cocos
 from cocos.actions import *
+from cocos.collision_model import *
 
 class BasicMonster(cocos.sprite.Sprite):
     def __init__(self, position):
         super(BasicMonster, self).__init__("enemy.png", position=position)
+        ## TODO: was doing collisions here
+        # self.cshape = self.get_rect()
 
     def spawned(self):
-        time = random.gauss(15, 10)
-        if time < 1:
-            time = 1
-        self.do(MoveTo((400,0), time))
+        time = random.gauss(30, 10)
+        if time < 5:
+            time = 5
+        self.do(MoveTo((self.position[0],30), time) +
+                CallFunc(self.reached_target))
+    
+    def reached_target(self):
+        print("you lose!")
+        self.kill()
+
+    def hit(self, bullet):
+        print("AAARGH!")
+        self.kill()
 
 
 ######
@@ -57,6 +69,7 @@ class ShooterTurret(Structure):
         direction = (other_pos - my_pos).normalize()
         direction *= 100
         while len(self.bullets) < 10:
+            # la formula dell'angolo e' ottenuta con trial and error. non toccare piu' :)
             angle = -cocos.euclid.Vector2(1,0).angle(direction) * 180 / math.pi
             bullet = BasicBullet(self.position, direction,angle , self.city.attackers )
             self.bullets.append(bullet)
@@ -124,8 +137,13 @@ class MonsterLayer(cocos.layer.Layer):
 
     def start_spawning(self):
         self.schedule_interval(self.generate_monster, self.delays[0])
+        self.schedule_interval(self.regen_collision_grid, 0.2)
         print("scheduled in % seconds" % self.delays[0])
 
+    def regen_collision_grid(self, dt):
+        self.collision = CollisionManagerGrid(0,800,0,600, 100, 100)
+        
+        
     def generate_monster(self, dt):
         self.unschedule(self.generate_monster)
         print("spawning")
