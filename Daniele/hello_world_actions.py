@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'cocos2d/pyglet-1.1.4
 
 
 import random
+import math
 
 import cocos
 from cocos.actions import *
@@ -42,6 +43,58 @@ class Structure(cocos.sprite.Sprite):
 class ShooterTurret(Structure):
     def __init__(self, position):
         super(ShooterTurret, self).__init__("shooter.png", (30,30), position)
+        self.schedule_interval(self.reload_and_target, 3)
+        self.bullets = []
+
+    def reload_and_target(self, dt):
+        #print("Check", self.city.attackers.spawned)
+        if not self.city.attackers.spawned:
+            return
+        #print("Reloaded!")
+        target = random.choice(self.city.attackers.spawned)
+        my_pos = cocos.euclid.Vector2(*self.position)
+        other_pos = cocos.euclid.Vector2(*target.position)
+        direction = (other_pos - my_pos).normalize()
+        direction *= 100
+        while len(self.bullets) < 10:
+            angle = -cocos.euclid.Vector2(1,0).angle(direction) * 180 / math.pi
+            bullet = BasicBullet(self.position, direction,angle , self.city.attackers )
+            self.bullets.append(bullet)
+        self.schedule_interval(self.shoot_one_bullet, 0.1)
+
+
+    def shoot_one_bullet(self, dt):
+        bb = self.bullets.pop()
+        self.city.add(bb)
+        bb.shooted()
+        if not self.bullets:
+            self.unschedule(self.shoot_one_bullet)
+
+
+######
+class BasicBullet(cocos.sprite.Sprite):
+    def __init__(self, position, speed, angle, targets):
+        super(BasicBullet, self).__init__("bullet.png")
+        self.rotation = angle
+        self.targets = targets
+        self.velocity = speed
+        self.position = position
+
+    def shooted(self):
+        self.schedule(self.check_hits)
+        self.do(Move())
+
+    def check_hits(self, dt):
+        # TODO: check if it hits with anybody and call kill
+        # out of screen
+        if self.position[0] < -100 or self.position[1] < -100 \
+           or self.position[0] >900 or self.position[1] > 700:
+            self.kill_bullet()
+
+    def kill_bullet(self):
+        # is unschedule necessary?
+        self.unschedule(self.check_hits)
+        self.kill()
 
 #########
 class CityLayer(cocos.layer.Layer):
@@ -80,6 +133,7 @@ class MonsterLayer(cocos.layer.Layer):
         monster=self.to_spawn.pop(0)
         self.add(monster)
         monster.spawned()
+        self.spawned.append(monster)
         if self.to_spawn and self.delays:
             self.schedule_interval(self.generate_monster, self.delays[0])
             print("scheduled in % seconds" % self.delays[0])
@@ -104,15 +158,16 @@ class GameLayer(cocos.layer.ColorLayer):
 
         self.city = CityLayer()
         self.monsters = MonsterLayer()
+        self.city.set_attackers_layes(self.monsters)
         self.add(self.city)
         self.add(self.monsters)
 
         
-        self.city.add_structure(ShooterTurret((200,30)))
         self.city.add_structure(ShooterTurret((100,30)))
         self.city.add_structure(ShooterTurret((200,30)))
         self.city.add_structure(ShooterTurret((300,30)))
         self.city.add_structure(ShooterTurret((400,30)))
+        self.city.add_structure(ShooterTurret((500,30)))
         
         for i in range(20):
             m = BasicMonster((i*50, 500))
