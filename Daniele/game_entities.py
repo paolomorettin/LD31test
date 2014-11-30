@@ -62,6 +62,9 @@ class Structure(cocos.sprite.Sprite):
     def start(self):
         pass
 
+    def stop(self):
+        pass
+    
     def get_game():
         return self.parent.get_game()
 
@@ -75,6 +78,11 @@ class TurretBase(Structure):
 
     def start(self):
         self.schedule_interval(self.reload_and_target, self.burstinterval)
+        self.bullets = []
+
+    def stop(self):
+        self.unschedule(self.reload_and_target)
+        self.unschedule(self.shoot_one_bullet)
 
     def reload_and_target(self, dt):
         #print("Check", self.city.attackers.spawned)
@@ -103,6 +111,7 @@ class TurretBase(Structure):
 
     def get_game():
         return self.parent.get_game()
+    
 ######
 class BasicBullet(cocos.sprite.Sprite):
     def __init__(self, position, speed, angle, targets):
@@ -145,15 +154,26 @@ class CityLayer(cocos.layer.Layer):
         self.attackers = None
 
     def add_structure(self, struct):
-        self.add(struct)
-        struct.set_city(self)
         self.structures.append(struct)
 
     def set_attackers_layes(self, layer):
         self.attackers = layer
 
-    def get_game():
-        return self.parent.get_game()
+    def get_game(self):
+        return self._game
+
+    def set_game_layer(self, gl):
+        self._game = gl
+
+    def start(self):
+        for s in self.structures:
+            self.add(s)
+            s.set_city(self)
+            s.start()
+    
+    def stop(self):
+        for s in self.structures:
+            s.stop()
     
 class MonsterLayer(cocos.layer.Layer):
     def __init__(self):
