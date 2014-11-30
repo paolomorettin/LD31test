@@ -19,161 +19,9 @@ import cocos
 from cocos.actions import *
 from cocos.collision_model import *
 
-def rect2cshape(rect):
-    return AARectShape(rect.center, rect.size[0]/2, rect.size[1]/2)
+from game_entities import BasicMonster, Structure, TurretBase, BasicBullet, CityLayer, MonsterLayer
 
-
-class BasicMonster(cocos.sprite.Sprite):
-    def __init__(self, position):
-        super(BasicMonster, self).__init__("enemy.png", position=position)
-        ## TODO: was doing collisions here
-        self.cshape = rect2cshape(self.get_rect())
-
-    def spawned(self):
-        time = random.gauss(30, 10)
-        if time < 5:
-            time = 5
-        self.do(MoveTo((self.position[0],30), time) +
-                CallFunc(self.reached_target))
-
-    
-    def reached_target(self):
-        print("you lose!")
-        self.parent.child_killed(self)
-        self.kill()
-
-    def hit(self, bullet):
-        print("AAARGH!")
-        self.parent.child_killed(self)
-        self.kill()
-
-
-######
-class Structure(cocos.sprite.Sprite):
-    def __init__(self, image, dimensions, position):
-        super(Structure, self).__init__(image, position=position)
-        self.dimensions = dimensions
-        self.city=None
-
-    def set_city(self, city):
-        self.city=city
-
-class ShooterTurret(Structure):
-    def __init__(self, position):
-        super(ShooterTurret, self).__init__("shooter.png", (30,30), position)
-        self.schedule_interval(self.reload_and_target, 3)
-        self.bullets = []
-
-    def reload_and_target(self, dt):
-        #print("Check", self.city.attackers.spawned)
-        if not self.city.attackers.spawned:
-            return
-        #print("Reloaded!")
-        target = random.choice(self.city.attackers.spawned)
-        my_pos = cocos.euclid.Vector2(*self.position)
-        other_pos = cocos.euclid.Vector2(*target.position)
-        direction = (other_pos - my_pos).normalize()
-        direction *= 100
-        while len(self.bullets) < 10:
-            # la formula dell'angolo e' ottenuta con trial and error. non toccare piu' :)
-            angle = -cocos.euclid.Vector2(1,0).angle(direction) * 180 / math.pi
-            bullet = BasicBullet(self.position, direction,angle , self.city.attackers )
-            self.bullets.append(bullet)
-        self.schedule_interval(self.shoot_one_bullet, 0.1)
-
-
-    def shoot_one_bullet(self, dt):
-        bb = self.bullets.pop()
-        self.city.add(bb)
-        bb.shooted()
-        if not self.bullets:
-            self.unschedule(self.shoot_one_bullet)
-
-
-######
-class BasicBullet(cocos.sprite.Sprite):
-    def __init__(self, position, speed, angle, targets):
-        super(BasicBullet, self).__init__("bullet.png")
-        self.rotation = angle
-        self.targets = targets
-        self.velocity = speed
-        self.position = position
-
-    def shooted(self):
-        self.schedule(self.check_hits)
-        self.do(Move())
-
-    def check_hits(self, dt):
-        self.cshape = rect2cshape(self.get_rect())
-        colliding = self.targets.collision.objs_colliding(self)
-        for m in colliding:
-            m.hit(self)
-        # TODO: check if it hits with anybody and call kill
-        # out of screen
-        if self.position[0] < -100 or self.position[1] < -100 \
-           or self.position[0] >900 or self.position[1] > 700:
-            self.kill_bullet()
-
-    def kill_bullet(self):
-        # is unschedule necessary?
-        self.unschedule(self.check_hits)
-        self.kill()
-
-#########
-class CityLayer(cocos.layer.Layer):
-    def __init__(self):
-        super(CityLayer, self).__init__()
-        self.structures = []
-        self.attackers = None
-
-    def add_structure(self, struct):
-        self.add(struct)
-        struct.set_city(self)
-        self.structures.append(struct)
-
-    def set_attackers_layes(self, layer):
-        self.attackers = layer
-
-class MonsterLayer(cocos.layer.Layer):
-    def __init__(self):
-        super(MonsterLayer, self).__init__()
-        self.to_spawn = []
-        self.delays = []
-        self.spawned = []
-
-    def schedule_monster(self, monster, delay):
-        self.to_spawn.append(monster)
-        self.delays.append(delay)
-
-    def start_spawning(self):
-        self.schedule_interval(self.generate_monster, self.delays[0])
-        self.schedule_interval(self.regen_collision_grid, 0.2) # not done every frame to speed up things
-        print("scheduled in % seconds" % self.delays[0])
-
-    def regen_collision_grid(self, dt):
-        self.collision = CollisionManagerGrid(0,800,0,600, 100, 100)
-        for m in self.spawned:
-            m.cshape = rect2cshape(m.get_rect())
-            self.collision.add(m)
-
-    def generate_monster(self, dt):
-        self.unschedule(self.generate_monster)
-        print("spawning")
-        timepassed=self.delays.pop(0)
-        monster=self.to_spawn.pop(0)
-        self.add(monster)
-        monster.spawned()
-        self.spawned.append(monster)
-        if self.to_spawn and self.delays:
-            self.schedule_interval(self.generate_monster, self.delays[0])
-            print("scheduled in % seconds" % self.delays[0])
-
-    def child_killed(self, child):
-        # poor child :'(
-        self.collision.remove_tricky(child)
-        self.spawned.remove(child)
-
-    # A color layer  is a Layer with the a color attribute
+# A color layer  is a Layer with the a color attribute
 class GameLayer(cocos.layer.ColorLayer):
     def __init__(self):
         # blueish color
@@ -197,16 +45,21 @@ class GameLayer(cocos.layer.ColorLayer):
         self.add(self.city)
         self.add(self.monsters)
 
-        
-        self.city.add_structure(ShooterTurret((100,30)))
-        self.city.add_structure(ShooterTurret((200,30)))
-        self.city.add_structure(ShooterTurret((300,30)))
-        self.city.add_structure(ShooterTurret((400,30)))
-        self.city.add_structure(ShooterTurret((500,30)))
-        
-        for i in range(20):
+
+        for t in range(5):
+            turret = TurretBase((100*t, 30))
+            self.city.add_structure(turret)
+            turret.start()
+            
+        for i in range(10):
             m = BasicMonster((i*50, 500))
             self.monsters.schedule_monster(m , 1.0/(i+1))
+        for i in range(10):
+            m = BasicMonster((i*50, 550))
+            self.monsters.schedule_monster(m , 0.1)
+        for i in range(10):
+            m = BasicMonster((i*50, 600))
+            self.monsters.schedule_monster(m , 0.1)
 
 
         self.monsters.start_spawning()
@@ -220,12 +73,41 @@ class GameLayer(cocos.layer.ColorLayer):
         # tell the sprite to scaleback and then scale, and repeat these 2 actions forever
         #sprite.do( Repeat( Reverse(scale) + scale ) )
 
+
+    def game_over(self):
+        cocos.director.director.pop()
+
+    def get_game(self):
+        return self
+
+class PlanningLayer(cocos.layer.ColorLayer):
+    def __init__(self):
+        
+        super( PlanningLayer, self ).__init__(0,10,0,255)
+
+        menutitems = []
+        menutitems.append( cocos.menu.MenuItem('Start', self.on_new_game ) )
+        menutitems.append( cocos.menu.MenuItem('Quit', self.on_quit ) )
+        menu = cocos.menu.Menu("Main Menu")
+        menu.create_menu( menutitems, cocos.menu.zoom_in(), cocos.menu.zoom_out())
+        self.add(menu)
+
+        for t in range(5):
+            turret = TurretBase((100*t, 30))
+            self.add(turret)
+
+    def on_new_game(self):
+        cocos.director.director.push(cocos.scene.Scene(GameLayer()))
+
+    def on_quit(self):
+        sys.exit(0)
+    
 if __name__ == "__main__":
     # director init takes the same arguments as pyglet.window
     cocos.director.director.init(width=800, height=600)
 
     # We create a new layer, an instance of HelloWorld
-    hello_layer = GameLayer ()
+    hello_layer = PlanningLayer ()
 
     # A scene that contains the layer hello_layer
     main_scene = cocos.scene.Scene (hello_layer)
