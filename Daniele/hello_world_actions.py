@@ -12,7 +12,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'cocos2d/cocos2d-0.6.
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'cocos2d/pyglet-1.1.4'))
 #
 
-
 import random
 import math
 
@@ -20,11 +19,15 @@ import cocos
 from cocos.actions import *
 from cocos.collision_model import *
 
+def rect2cshape(rect):
+    return AARectShape(rect.center, rect.size[0]/2, rect.size[1]/2)
+
+
 class BasicMonster(cocos.sprite.Sprite):
     def __init__(self, position):
         super(BasicMonster, self).__init__("enemy.png", position=position)
         ## TODO: was doing collisions here
-        # self.cshape = self.get_rect()
+        self.cshape = rect2cshape(self.get_rect())
 
     def spawned(self):
         time = random.gauss(30, 10)
@@ -32,13 +35,16 @@ class BasicMonster(cocos.sprite.Sprite):
             time = 5
         self.do(MoveTo((self.position[0],30), time) +
                 CallFunc(self.reached_target))
+
     
     def reached_target(self):
         print("you lose!")
+        self.parent.child_killed(self)
         self.kill()
 
     def hit(self, bullet):
         print("AAARGH!")
+        self.parent.child_killed(self)
         self.kill()
 
 
@@ -98,6 +104,10 @@ class BasicBullet(cocos.sprite.Sprite):
         self.do(Move())
 
     def check_hits(self, dt):
+        self.cshape = rect2cshape(self.get_rect())
+        colliding = self.targets.collision.objs_colliding(self)
+        for m in colliding:
+            m.hit(self)
         # TODO: check if it hits with anybody and call kill
         # out of screen
         if self.position[0] < -100 or self.position[1] < -100 \
@@ -137,13 +147,15 @@ class MonsterLayer(cocos.layer.Layer):
 
     def start_spawning(self):
         self.schedule_interval(self.generate_monster, self.delays[0])
-        self.schedule_interval(self.regen_collision_grid, 0.2)
+        self.schedule_interval(self.regen_collision_grid, 0.2) # not done every frame to speed up things
         print("scheduled in % seconds" % self.delays[0])
 
     def regen_collision_grid(self, dt):
         self.collision = CollisionManagerGrid(0,800,0,600, 100, 100)
-        
-        
+        for m in self.spawned:
+            m.cshape = rect2cshape(m.get_rect())
+            self.collision.add(m)
+
     def generate_monster(self, dt):
         self.unschedule(self.generate_monster)
         print("spawning")
@@ -155,6 +167,11 @@ class MonsterLayer(cocos.layer.Layer):
         if self.to_spawn and self.delays:
             self.schedule_interval(self.generate_monster, self.delays[0])
             print("scheduled in % seconds" % self.delays[0])
+
+    def child_killed(self, child):
+        # poor child :'(
+        self.collision.remove_tricky(child)
+        self.spawned.remove(child)
 
     # A color layer  is a Layer with the a color attribute
 class GameLayer(cocos.layer.ColorLayer):
