@@ -8,6 +8,7 @@ from __future__ import division, print_function, unicode_literals
 
 import random
 import math
+import sys
 
 import cocos
 from cocos.actions import *
