@@ -1,13 +1,13 @@
 import cocos, pyglet
 import maplayer, gamelogic
 
-class Player(cocos.layer.ColorLayer):
+class Player(cocos.layer.Layer):
     is_event_handler = True
     PLAYER_SIZE = 26
 
     def __init__(self):
-        super(Player, self).__init__(255,255,255,0)
-        self.game = gamelogic.Game.instance()
+        #super(Player, self).__init__(255,255,255,255)
+        super(Player, self).__init__()
         self.sprite = cocos.sprite.Sprite("img/player.png")
         self.cell_x = 0
         self.cell_y = 0
@@ -15,6 +15,7 @@ class Player(cocos.layer.ColorLayer):
         self.add(self.sprite)
         self.curr_action = None
         self.schedule_interval(self.update, 0.5)
+        self.game = None
 
     def _get_drawing_coors(self):
         base_x = maplayer.MapLayer.SPRITE_SIZE * self.cell_x
@@ -26,6 +27,7 @@ class Player(cocos.layer.ColorLayer):
         return self.game.get_cell(self.cell_x, self.cell_y).wall[direction] == 0
 
     def update(self, timedelta):
+        if not self.game: self.game = gamelogic.Game.instance()
         if self.curr_action == pyglet.window.key.LEFT and self._movement_allowed(gamelogic.DIRECTION_LEFT):
             self.cell_x -= 1
         elif self.curr_action == pyglet.window.key.UP and self._movement_allowed(gamelogic.DIRECTION_UP):

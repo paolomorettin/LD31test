@@ -6,8 +6,9 @@ class MapLayer(cocos.layer.ColorLayer):
     WALL_SIZE = 2
 
     def __init__(self):
-        super(MapLayer, self).__init__(255, 255, 255, 255)  # white, opaque
+        super(MapLayer, self).__init__(255, 255, 255, 255)
         self.game = gamelogic.Game.instance()
+        self.update_view(0, 0, gamelogic.MAPSIZE[0], gamelogic.MAPSIZE[1])
 
     def _get_sprite_drawing_coors(self, cell_x, cell_y, side):
         base_x = cell_x * MapLayer.SPRITE_SIZE
@@ -31,7 +32,6 @@ class MapLayer(cocos.layer.ColorLayer):
 
         offset = MapLayer.SPRITE_SIZE / 2
         return base_x + offset, base_y + offset
-
 
     def update_view(self, startx, starty, endx, endy):
         """

@@ -1,4 +1,7 @@
 from datastructures import GameMapData
+import maplayer
+import player
+import cocos
 
 
 # directions (enum)
@@ -22,7 +25,7 @@ class Cell:
 
 
 # Game state.
-class Game:
+class Game(object):
     _instance = None
 
     @staticmethod
@@ -38,7 +41,6 @@ class Game:
         self.cell_cache = {}
         self._all_data = None
         self.triggers = {}
-        # game components
         self.maplayer = None
 
     def load_from(self, fname):
@@ -63,6 +65,7 @@ class Game:
         return c
 
     def enter_cell(self,x,y):
+        return
         # called when player enters a cell. May trigger some changes over the map.
         # returns list of NEW items to put on the map.
         trigger = self.triggers[(x,y)]
