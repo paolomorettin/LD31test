@@ -26,6 +26,9 @@ class LevelData:
 class TriggerData:
     """ Trigger that is present in a block """
     def __init__(self):
-        self.block = 0
+        # coordinates to change
+        self.from_cell = (0,0)
+        # end coordinates to change (inclusive). Must be >= from_cell
+        self.to_cell = (0,0)
         self.newlevel = 0
 
