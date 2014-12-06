@@ -38,6 +38,8 @@ class Game:
         self.cell_cache = {}
         self._all_data = None
         self.triggers = {}
+        # game components
+        self.maplayer = None
 
     def load_from(self, fname):
         # loads from the specified filename
@@ -63,6 +65,54 @@ class Game:
     def enter_cell(self,x,y):
         # called when player enters a cell. May trigger some changes over the map.
         # returns list of NEW items to put on the map.
-        # TODO: Stub
+        trigger = self.triggers[(x,y)]
+        if trigger is None:
+            return
+        newlevel = self._all_data.levels[newlevel]
+        # x1 y1 x2 y2 are in cell space
+        (x1, y1) = (trigger.from_cell[0], trigger.from_cell[1])
+        (x2, y2) = (trigger.to_cell[0]+1, trigger.to_cell[1]+1)
+        
+        # update the map for the target locations
+        for x in range(x1, x2):
+            for y in range(y1, y2):
+                # foreach cell, copy the cell inner value
+                self.matrix[(x*2+1, y*2+1)] = newlevel.matrix[(x*2+1, y*2+1)]
+                # and the surrounding walls
+                self.matrix[(x*2+2, y*2+1)] = newlevel.matrix[(x*2+2, y*2+1)]
+                self.matrix[(x*2,   y*2+1)] = newlevel.matrix[(x*2,   y*2+1)]
+                self.matrix[(x*2+1, y*2+2)] = newlevel.matrix[(x*2+1, y*2+2)]
+                self.matrix[(x*2+1, y*2  )] = newlevel.matrix[(x*2+1, y*2  )]
+
+        # insert new triggers, if they are there
+        new_triggers = {t for t in newlevel.triggers
+                        if t.from_cell[0] >= x1
+                        and t.from_cell[1] >= y1
+                        and t.to_cell[0] <= x2
+                        and t.to_cell[1] <= y2}
+        
+        survived_triggers = {t for t in self.triggers
+                             if not (t.from_cell[0] >= x1
+                                     and t.from_cell[1] >= y1
+                                     and t.to_cell[0] <= x2
+                                     and t.to_cell[1] <= y2)}
+
+        new_triggers.update(survived_triggers)
+        self.triggers = survived_triggers
+
+        # now consider a bit larger area, since we need to redraw the
+        # walls also of neighboring cells.
+        if x1 >= 1:
+            x1 -= 1
+        if y1 >= 1:
+            y1 -= 1
+        if x2 <= MAPSIZE[0]:
+            x2 += 1
+        if y2 <= MAPSIZE[1]:
+            y2 += 1
+
+        if self.maplayer is not None:
+            self.maplayer.update_view(x1, y1, x2, y2)
+
         return []
 
