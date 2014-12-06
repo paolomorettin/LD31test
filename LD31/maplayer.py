@@ -20,10 +20,10 @@ class MapLayer(cocos.layer.ColorLayer):
             y_offset = MapLayer.SPRITE_SIZE / 2
         elif side == gamelogic.DIRECTION_DOWN:
             x_offset = MapLayer.SPRITE_SIZE / 2
-            y_offset = MapLayer.SPRITE_SIZE - (MapLayer.WALL_SIZE / 2)
+            y_offset = MapLayer.WALL_SIZE / 2
         elif side == gamelogic.DIRECTION_UP:
             x_offset = MapLayer.SPRITE_SIZE / 2
-            y_offset = MapLayer.WALL_SIZE / 2
+            y_offset = MapLayer.SPRITE_SIZE - (MapLayer.WALL_SIZE / 2)
         else:
             print "MapLayer ERROR: Unknown side " + side
         return base_x + x_offset, base_y + y_offset
