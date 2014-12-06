@@ -5,18 +5,17 @@ import pickle
 class GameMapData:
     """ Holds the map of the entire game """
     def __init__(self):
-        # levelnumber -> Blockdata
-        self.blocks = {} # int -> BlockData
+        # levelnumber -> LevelData
+        self.levels = {} # int -> LevelData
 
-    @classmethod
+    @staticmethod
     def load(fname):
         with open(fname,"r") as f:
             return pickle.load(f)
 
-    @classmethod
     def save(map, fname):
         with open(fname,"w") as f:
-            return pickle.dump(f, map)
+            pickle.dump(map, f)
 
 class LevelData:
     """ All the data in a block """

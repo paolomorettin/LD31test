@@ -61,6 +61,7 @@ if __name__ == "__main__":
         print "However, if you just want to run a test, use -debug option."
         sys.exit(0)
     cocos.director.director.init()
+    gamelogic.Game.instance().load_from("level.dat")
     test_map = MapLayer()
     test = cocos.scene.Scene(test_map)
     test_map.update_view(0,0,10,10)
