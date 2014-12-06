@@ -7,6 +7,10 @@ DIRECTION_UP, DIRECTION_LEFT, DIRECTION_DOWN, DIRECTION_RIGHT = range(4)
 # type
 CELLTYPE_NORMAL, CELLTYPE_START, CELLTYPE_END = range(3)
 
+# map size in cells
+MAPSIZE = (26,20)
+
+
 # Single cell of the map
 class Cell:
     def __init__(self):
