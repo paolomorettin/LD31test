@@ -60,8 +60,9 @@ if __name__ == "__main__":
         print "This class is not intended to be run in a main file."
         print "However, if you just want to run a test, use -debug option."
         sys.exit(0)
-    cocos.director.director.init()
-    gamelogic.Game.instance().load_from("level.dat")
+    cocos.director.director.init(width=800, height=600)
+    g =gamelogic.Game.instance()
+    g.load_from("level.dat")
     test_map = MapLayer()
     test = cocos.scene.Scene(test_map)
     test_map.update_view(0,0,gamelogic.MAPSIZE[0],gamelogic.MAPSIZE[1])
