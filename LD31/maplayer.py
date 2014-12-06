@@ -64,6 +64,6 @@ if __name__ == "__main__":
     gamelogic.Game.instance().load_from("level.dat")
     test_map = MapLayer()
     test = cocos.scene.Scene(test_map)
-    test_map.update_view(0,0,10,10)
+    test_map.update_view(0,0,gamelogic.MAPSIZE[0],gamelogic.MAPSIZE[1])
     cocos.director.director.run(test)
 
