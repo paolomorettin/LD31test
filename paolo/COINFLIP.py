@@ -22,13 +22,11 @@ class CP_Parser :
     @staticmethod
     def parse_code(code) :
         tokens = CP_Parser.tokenize(code)
-        print tokens
         program = []
         i = 0
         j = 0
         while j < len(tokens) :
             if tokens[j] == ';' :
-                print "DECL: {}".format(str(tokens[i:j]))
                 program.append(CP_Parser.parse_decl(tokens[i:j]))
                 i = j + 1
             j += 1

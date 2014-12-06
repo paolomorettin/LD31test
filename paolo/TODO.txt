@@ -1,3 +1,5 @@
+cose che cazzo mi sono proprio dimenticato ma ho troppo sonno:
+
 
 cose importanti:
 - memoria dei bot
@@ -11,3 +13,9 @@ altro:
 - radar di prossimita' nemici
 - qualcosa per far comunicare i robottini dello stesso team (tipo pi-calculus <-- wawawawawaw)
 - muri distruttibiliii, lava, acido, formaggia
+- colpi limitati e/o cooldown prima di sparare di nuovo
+- falsi robottini esca (esplosivi?)
+- sensore upradabile che ti dice magari se un bot è nemico, o addirittura (!) da che parte guarda
+
+cose fiche che non verranno mai implementate:
+- scheda che aggiunge semplici operazioni aritmetiche, con "slot" dove salvare variabili/contatori.. <- pesanti modifiche al linguaggio

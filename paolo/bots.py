@@ -30,16 +30,19 @@ class Game :
                     out[-1].append(' ')
 
         for b in self.bots :
-            if b.orientation == 0 :
-                c = '>'
-            elif b.orientation == 90 :
-                c = '^'
-            elif b.orientation == 180 :
-                c = '<'
-            elif b.orientation == 270 :
-                c = 'V'
+            if b.status == 'OPERATIVE' :
+                if b.orientation == 0 :
+                    c = '>'
+                elif b.orientation == 90 :
+                    c = '^'
+                elif b.orientation == 180 :
+                    c = '<'
+                elif b.orientation == 270 :
+                    c = 'V'
+                else :
+                    raise ValueError("Orientation not in [0,90,180,270]")
             else :
-                raise ValueError("Orientation not in [0,90,180,270]")
+                c = '*'
             out[b.position[1]][b.position[0]] = c
         
         s_out = []
@@ -127,9 +130,10 @@ class Game :
                 crashes.append(d)
 
         for crash in crashes :
-            for bot in destination[crash] :
+            for bot in destinations[crash] :
                 bot.status = 'CRASHED'
                 
+        print destinations
         # evaluates the SHOOT actions
         shooting_bots = [bot for bot in self.bots if bot.action == 'SHOOT' and bot.status == 'OPERATIVE']
         for bot in shooting_bots :
@@ -148,11 +152,14 @@ class Game :
             target = bot.position
             for i in xrange(bot.fire_range) :
                 target = (target[0] + step[0],target[1] + step[1])
+                print target
                 if self.stage.map[target] == 'WALL' :
                     break
                 elif target in destinations and len(destinations[target]) == 1 : # if there's only one coming, shoots it, otherwise they'll crash before
+                    print "bau"
                     destinations[target][0].status = 'HIT'
                     break
+
 
         # evaluates the TURN actions
         turning_bots = [bot for bot in self.bots if bot.action.startswith('TURN') and bot.status == 'OPERATIVE']
@@ -236,13 +243,21 @@ if __name__ == '__main__' :
     smap = [[1]*7] + [[1] + [0]*5 + [1]]*5 + [[1]*7]
     stage = Stage(smap)
 
-    g = Game(stage)
-    bot1 = Bot(prog1,"player1",g,position=(2,2),orientation=270)
-    bot2 = Bot(prog2,"player2",g,position=(4,4),orientation=90)
+    g = Game(stage,clear_arena=False)
+    bot1 = Bot(prog1,"player1",g,position=(1,1),orientation=270)
+    bot2 = Bot(prog1,"player1",g,position=(5,1),orientation=270)
+    bot3 = Bot(prog2,"player2",g,position=(1,5),orientation=90)
+    bot4 = Bot(prog2,"player2",g,position=(5,5),orientation=90)
 
-    g.bots = [bot1,bot2]
+    g.bots = [bot1,bot2,bot3,bot4]
+    from os import system
+    from time import sleep
+    system('clear')
     print g.prettyPrint()
+
+    
     while not g.gameOver() :
-        raw_input()
+        sleep(1)
         g.turn()
+        system('clear')
         print g.prettyPrint()
