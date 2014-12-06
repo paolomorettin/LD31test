@@ -5,6 +5,7 @@ import pickle
 class GameMapData:
     """ Holds the map of the entire game """
     def __init__(self):
+        # levelnumber -> Blockdata
         self.blocks = {} # int -> BlockData
 
     @classmethod
@@ -17,16 +18,11 @@ class GameMapData:
         with open(fname,"w") as f:
             return pickle.dump(f, map)
 
-class BlockData:
-    """ Holds the multiple versions of a block in the map """
-    def __init__(self):
-        self.level = {} # int -> BlockLevelData
-
-class BlockLevelData:
-    """ Holds the data of a single version of a block"""
+class LevelData:
+    """ All the data in a block """
     def __init__(self):
         self.matrix = {} # (int, int) -> int
-        self.triggers = []
+        self.triggers = {} # (int, int) -> TriggerDatax
 
 class TriggerData:
     """ Trigger that is present in a block """
