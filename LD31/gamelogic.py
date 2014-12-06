@@ -23,6 +23,9 @@ class Cell:
         self.style = 0
         self.type = CELLTYPE_NORMAL
 
+    def __str__(self):
+        return "walls [up, left, down, right] = "+str(self.wall)+" type "+str(self.type)+" lev "+str(self.style)
+
 
 # Game state.
 class Game(object):
@@ -58,10 +61,10 @@ class Game(object):
         c = Cell()
         c.style = self.current_cell_level[(x,y)]
         c.type = self.matrix[(x*2+1, y*2+1)]
-        c.wall[DIRECTION_UP] =    self.matrix[(x*2+2, y*2+1)]
-        c.wall[DIRECTION_DOWN] =  self.matrix[(x*2,   y*2+1)]
-        c.wall[DIRECTION_RIGHT] = self.matrix[(x*2+1, y*2+2)]
-        c.wall[DIRECTION_LEFT] =  self.matrix[(x*2+1, y*2  )]
+        c.wall[DIRECTION_UP] =    self.matrix[(x*2+1, y*2+2)]
+        c.wall[DIRECTION_DOWN] =  self.matrix[(x*2+1, y*2+0)]
+        c.wall[DIRECTION_RIGHT] = self.matrix[(x*2+2, y*2+1)]
+        c.wall[DIRECTION_LEFT] =  self.matrix[(x*2+0, y*2+1)]
         return c
 
     def enter_cell(self,x,y):

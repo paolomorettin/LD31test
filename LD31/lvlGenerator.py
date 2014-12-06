@@ -1,4 +1,5 @@
 from random import shuffle
+from datastructures import *
 
 class Graph :
     def __init__(self,size,start_point,end_point,min_steps=1) :
@@ -113,7 +114,7 @@ class Graph :
 
 
 if __name__ == '__main__' :
-    g = Graph((30,10),(0,0),(29,9))
+    g = Graph((26,20),(0,0),(25,19))
     
     matrix = g.graphToMatrix()
     s = ''
@@ -125,4 +126,10 @@ if __name__ == '__main__' :
             else : 
                 s += '#'
         s += '\n'
+        
+    g = GameMapData()
+    l = LevelData()
+    l.matrix = matrix
+    g.levels[0] = l
+    g.save("level.dat")
     print s
