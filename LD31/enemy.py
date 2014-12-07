@@ -8,8 +8,7 @@ class Enemy(cocos.layer.Layer):
     PLAYER_SIZE = 26
 
     def __init__(self,position) :
-        #super(Player, self).__init__(255,255,255,255)
-        super(Player, self).__init__()
+        super(Enemy, self).__init__()
                                 
         image = pyglet.resource.image("img/enemy.png")
        
