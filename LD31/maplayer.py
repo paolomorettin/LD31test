@@ -14,23 +14,44 @@ class MapLayer(cocos.layer.ColorLayer):
         super(MapLayer, self).__init__(255, 255, 255, 255)
         self.game = gamelogic.Game.instance()
         self.block = [None] * 6
-        for idx, b in enumerate(self.block):
-            self.update(idx, animation=False)
+        for i in range(6):
+            self.__update_block(i, False)
 
-    def update(self, idx, animation=False):
+    def update_blocks(self, block_list):
+        """
+        :type block_list:   list of int
+        :param block_list:  IDs of the blocks which need to be updated
+        :return:
+        """
+        neighbours = set()
+        for block_id in block_list:
+            self.__update_block(block_id, False)
+            neighbours.update(MapLayer.BLOCK_NEIGHBOUR[block_id])
+        neighbours -= set(block_list)
+        for neigh in neighbours:
+            self.__update_block(neigh, False)
+
+    def __load_sprite(self, path):
+        img = pyglet.resource.image(path)
+        glTexParameteri(img.texture.target, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glTexParameteri(img.texture.target, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        return cocos.sprite.Sprite(img)
+
+    def __update_block(self, idx, animation=False):
         new_batch = cocos.batch.BatchNode()
         startx, endx, starty, endy = self.game.get_block_coords(idx)
         for x in range(startx, endx):
             for y in range(starty, endy):
                 cell = self.game.get_cell(x, y)
+                if cell.type == gamelogic.CELLTYPE_END:
+                    end_flag = self.__load_sprite("img/end.png")
+                    x_pos = x * MapLayer.SPRITE_SIZE + MapLayer.SPRITE_SIZE / 2
+                    y_pos = y * MapLayer.SPRITE_SIZE + MapLayer.SPRITE_SIZE / 2
+                    end_flag.position = x_pos, y_pos
+                    new_batch.add(end_flag)
                 for side in range(4):
                     if cell.wall[side] == 1:
-                        image = pyglet.resource.image("img/wall.png")
-                        glTexParameteri(image.texture.target,
-                                        GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-                        glTexParameteri(image.texture.target,
-                                        GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-                        wall = cocos.sprite.Sprite(image)
+                        wall = self.__load_sprite("img/wall.png")
                         if side == gamelogic.DIRECTION_UP or side == gamelogic.DIRECTION_DOWN:
                             wall.rotation = 90
                         wall.position = self._get_sprite_drawing_coors(x, y, side)

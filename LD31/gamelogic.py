@@ -127,8 +127,9 @@ class Game(object):
             #new_triggers.update(survived_triggers)
             #self.triggers = survived_triggers
 
-            if self.maplayer is not None:
-                self.maplayer.update(bid, animation=False)
+        if self.maplayer is not None:
+            self.maplayer.update_blocks(trigger.block_id)
+
         del self.triggers[(xc,yc)]
         return []
 
@@ -152,7 +153,5 @@ class Game(object):
         end_block = self.get_coords_block(end_x, end_y)
         dirty_blocks.add(end_block)
         if self.maplayer is not None:
-            for i in dirty_blocks:
-                print "--> VIEWUPDATE ",i
-                self.maplayer.update(i, animation=False)
+            self.maplayer.update_blocks(dirty_blocks)
         pass
