@@ -42,7 +42,6 @@ class Game(object):
     def __init__(self):
         print "Creating a new Game."
         self.matrix = {}
-        self.cell_cache = {}
         self._all_data = None
         self.triggers ={}
         self.levelnr = 0
@@ -136,7 +135,6 @@ class Game(object):
         if self.maplayer is not None:
             self.maplayer.update_blocks(trigger.block_id)
 
-        self.die()
         return []
 
     def die(self):
@@ -149,7 +147,6 @@ class Game(object):
 
     def restart(self):
         self.levelnr = 0
-        newlevel = self._all_data.levels[self.levelnr]
         (self.player.cell_x, self.player.cell_y) = self.get_start_point()
         self.refresh_level()
     
