@@ -3,7 +3,7 @@ import pyglet
 from pyglet.gl.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
 import gamelogic
 
-class MapLayer(cocos.layer.ColorLayer):
+class MapLayer(cocos.layer.Layer):
     SPRITE_SIZE = 30
     WALL_SIZE = 5
 
@@ -13,8 +13,13 @@ class MapLayer(cocos.layer.ColorLayer):
     LEVEL_COLORS = [(255, 255, 255), (255, 0, 0), (0, 255, 0), (0, 0, 255)]
 
     def __init__(self):
-        super(MapLayer, self).__init__(255, 255, 255, 255)
+        super(MapLayer, self).__init__()
         self.game = gamelogic.Game.instance()
+
+        self.back = self.__load_sprite("img/back.png")
+        self.back.position = (400, 300)
+        self.add(self.back)
+
         self.block = [None] * 6
         self.wall_builders = [self.__wall_top, self.__wall_left,
                               self.__wall_bottom, self.__wall_right]
