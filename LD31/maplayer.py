@@ -96,13 +96,13 @@ class MapLayer(cocos.layer.ColorLayer):
             self.add(new_batch)
         else:
             clouds = self.__load_sprite("img/cloud.png")
-            clouds.position = (0, 0)
-            self.add(clouds, z=1)
             cloud_x, cloud_y = self.__get_center(startx, endx, starty, endy)
+            clouds.position = (cloud_x-1000, cloud_y)
+            self.add(clouds, z=1)
             clouds.do(cocos.actions.MoveTo((cloud_x, cloud_y), 3) +\
                       cocos.actions.CallFunc(self.remove, self.block[idx]) +\
                       cocos.actions.CallFunc(self.add, new_batch) +\
-                      cocos.actions.MoveTo((2000, 1000), 3))
+                      cocos.actions.MoveTo((cloud_x+1000, cloud_y), 3))
 
         self.block[idx] = new_batch
 
