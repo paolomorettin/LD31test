@@ -40,6 +40,7 @@ class MapLayer(cocos.layer.Layer):
             if self.storm is None:
                 self.storm = Storm(self)
                 self.parent.add(self.storm, z=1)
+                self.storm_started()
             self.storm.activate()
             self.mystery_sound.play()
             return
@@ -117,6 +118,18 @@ class MapLayer(cocos.layer.Layer):
         offset = MapLayer.SPRITE_SIZE / 2
         return base_x + offset, base_y + offset
 
+    def map_covered(self):
+        self.add_enemies()
+        self.update(False)
+
+    def storm_started(self):
+        self.game.player.disable_controls()
+        pass
+
+    def storm_ended(self):
+        self.game.player.enable_controls()
+        pass
+    
     def add_enemies(self):
         for idx in range(2):
             self.add(enemy.Enemy([random.randint(0, gamelogic.MAPSIZE[0]-1),
@@ -135,6 +148,6 @@ class Storm(cocos.sprite.Sprite):
     def activate(self):
         self.position = (-1000, 300)
         self.do(cocos.actions.MoveTo((400, 300), 3) +\
-                cocos.actions.CallFunc(self.maplayer.update, False) +\
-                cocos.actions.CallFunc(self.maplayer.add_enemies) +\
-                cocos.actions.MoveTo((2000, 300), 3))
+                cocos.actions.CallFunc(self.maplayer.map_covered) +\
+                cocos.actions.MoveTo((2000, 300), 3) +\
+                cocos.actions.CallFunc(self.maplayer.storm_ended))
