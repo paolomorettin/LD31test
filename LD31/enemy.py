@@ -11,6 +11,7 @@ class Enemy(cocos.layer.Layer):
         super(Enemy, self).__init__()
                                 
         image = pyglet.resource.image("img/enemy.png")
+        self.growl_sound = cocos.audio.pygame.mixer.Sound("sounds/growl1.wav")
        
         glTexParameteri(image.texture.target,
                         GL_TEXTURE_MAG_FILTER, GL_NEAREST)
@@ -88,6 +89,9 @@ class Enemy(cocos.layer.Layer):
         elif ran_move == gamelogic.DIRECTION_RIGHT:
             self.cell_x += 1
 
+        if random.randint(0,50) == 0 :
+            self.growl_sound.play()
+
         self.moving = True
         self.sprite.do(cocos.actions.MoveTo(self._get_drawing_coors(), 0.2) + cocos.actions.CallFunc(self.stopped_moving))
         if self.cell_x == self.game.player.cell_x and self.cell_y == self.game.player.cell_y:
@@ -95,3 +99,17 @@ class Enemy(cocos.layer.Layer):
 
     def stopped_moving(self):
         self.moving = False
+
+
+
+
+
+
+
+
+
+
+
+
+
+
