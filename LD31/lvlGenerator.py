@@ -179,6 +179,7 @@ if __name__ == '__main__' :
         l.matrix = matrix
         # such triggers
         for coord,id_b in g.triggers :
+            print "in level",i,"trigger at coord",coord, "will change", id_b, " to level ",i+1
             l.triggers[coord] = TriggerData(id_b,i+1)
 
         game_data.levels.append(l)
