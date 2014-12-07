@@ -5,15 +5,19 @@ import gamelogic
 
 class MapLayer(cocos.layer.ColorLayer):
     SPRITE_SIZE = 30
-    WALL_SIZE = 2
+    WALL_SIZE = 5
 
     BLOCK_NEIGHBOUR = [{1, 3}, {0, 2, 4}, {1, 5},
                        {0, 4}, {1, 3, 5}, {2, 4}]
+
+    LEVEL_COLORS = [(255, 255, 255), (255, 0, 0), (0, 255, 0), (0, 0, 255)]
 
     def __init__(self):
         super(MapLayer, self).__init__(255, 255, 255, 255)
         self.game = gamelogic.Game.instance()
         self.block = [None] * 6
+        self.wall_builders = [self.__wall_top, self.__wall_left,
+                              self.__wall_bottom, self.__wall_right]
         for i in range(6):
             self.__update_block(i, False)
 
@@ -37,6 +41,29 @@ class MapLayer(cocos.layer.ColorLayer):
         glTexParameteri(img.texture.target, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         return cocos.sprite.Sprite(img)
 
+
+    def __wall_top(self, x, y):
+        wall = self.__load_sprite("img/ice_mid2.png")
+        wall.rotation = 90
+        wall.position = self._get_sprite_drawing_coors(x, y, gamelogic.DIRECTION_UP)
+        return wall
+
+    def __wall_bottom(self, x, y):
+        wall = self.__load_sprite("img/ice_mid.png")
+        wall.rotation = 90
+        wall.position = self._get_sprite_drawing_coors(x, y, gamelogic.DIRECTION_DOWN)
+        return wall
+
+    def __wall_left(self, x, y):
+        wall = self.__load_sprite("img/ice_mid2.png")
+        wall.position = self._get_sprite_drawing_coors(x, y, gamelogic.DIRECTION_LEFT)
+        return wall
+
+    def __wall_right(self, x, y):
+        wall = self.__load_sprite("img/ice_mid.png")
+        wall.position = self._get_sprite_drawing_coors(x, y, gamelogic.DIRECTION_RIGHT)
+        return wall
+
     def __update_block(self, idx, animation=False):
         new_batch = cocos.batch.BatchNode()
         startx, endx, starty, endy = self.game.get_block_coords(idx)
@@ -51,16 +78,15 @@ class MapLayer(cocos.layer.ColorLayer):
                     new_batch.add(end_flag)
                 for side in range(4):
                     if cell.wall[side] == 1:
-                        wall = self.__load_sprite("img/wall.png")
-                        if side == gamelogic.DIRECTION_UP or side == gamelogic.DIRECTION_DOWN:
-                            wall.rotation = 90
-                        wall.position = self._get_sprite_drawing_coors(x, y, side)
+                        wall = self.wall_builders[side](x, y)
+                        wall.color = MapLayer.LEVEL_COLORS[cell.style]
                         new_batch.add(wall)
         if not animation:
             if self.block[idx]:
                 self.remove(self.block[idx])
             self.add(new_batch)
         else:
+
             self.block[idx].do(cocos.actions.FadeOut(2) + cocos.actions.CallFunc(self.add, new_batch))
         self.block[idx] = new_batch
 
