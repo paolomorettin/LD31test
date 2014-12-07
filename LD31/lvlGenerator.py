@@ -154,13 +154,48 @@ class Graph :
         return matrix
 
 
+def firstLevel(size) :
+
+    l = LevelData()
+    l.matrix = {}
+
+    l.start_point = (0,int(size[1]/2))
+    l.end_point = (size[0]-1,int(size[1]/2))
+
+    for y in xrange(size[1]*2 + 2) :
+        for x in xrange(size[0]*2 + 2) :
+            if y != size[1]+1 :
+                l.matrix[(x,y)] = 1
+            else :
+                l.matrix[(x,y)] = 0
+
+    s = ''
+    for y in xrange(max(map(lambda x:x[1],l.matrix.keys()))) :
+        for x in xrange(max(map(lambda x:x[0],l.matrix.keys()))) :
+            if l.matrix[(x,y)] == 0 :
+                s += ' '
+            else : 
+                s += '#'
+        s += '\n'
+
+    print s
+    l.triggers[l.end_point] = TriggerData([0,1,2,3,4,5],1)
+    
+    return l
+
+
+
 if __name__ == '__main__' :
 
     game_data = GameMapData()
-    starting_points = [(0,0),(25,19),(0,19),(25,0),(0,0)]
-    lovely_hardcoded_size = (26,20)
 
-    for i in xrange(4) :
+    # LOVELY HARDCODED DATA
+    lovely_hardcoded_size = (26,20)
+    number_of_levels = 4
+    game_data.levels.append( firstLevel(lovely_hardcoded_size) )
+    starting_points = [game_data.levels[-1].end_point,(25,19),(0,19),(25,0),(0,0)]
+
+    for i in xrange(number_of_levels) :
         sp = starting_points[i]
         ep = starting_points[i+1]
         g = Graph(lovely_hardcoded_size,sp,ep)
@@ -177,7 +212,6 @@ if __name__ == '__main__' :
 
         print s
         '''
-        print g.triggers
         l = LevelData()
         # so map
         l.matrix = matrix
@@ -185,11 +219,12 @@ if __name__ == '__main__' :
         l.start_point = g.start_point
         l.end_point = g.end_point
         # such triggers
-        for coord,id_b in g.triggers.items() :
-            print "in level",i,"trigger at coord",coord, "will change", id_b, " to level ",i+1
-            l.triggers[coord] = TriggerData(id_b,i+1)
+        if i < number_of_levels - 1 :
+            for coord,id_b in g.triggers.items() :
+                l.triggers[coord] = TriggerData(id_b,i+1)
 
         game_data.levels.append(l)
+
 
     game_data.save("level.dat")
 
