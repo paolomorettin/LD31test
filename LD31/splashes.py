@@ -27,18 +27,20 @@ class InitialSplashScreen(FullScreenSplash):
         cocos.audio.pygame.music.play(-1)
         cocos.director.director.replace(scene)
 
-
 class DeathScreen(FullScreenSplash):
     def __init__(self, main_scene):
         super(DeathScreen, self).__init__(main_scene,"img/death.png", 4)
         
     def close(self, timedelta, scene):
+        cocos.audio.pygame.music.load("sounds/music.wav")
+        cocos.audio.pygame.music.play(-1)
         cocos.director.director.replace(scene)
-
 
 class WinScreen(FullScreenSplash):
     def __init__(self,main_scene):
         super(WinScreen, self).__init__(main_scene,"img/win.png", 4)
         
     def close(self, timedelta, scene):
+        cocos.audio.pygame.music.load("sounds/music.wav")
+        cocos.audio.pygame.music.play(-1)
         cocos.director.director.replace(scene)
