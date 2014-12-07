@@ -4,7 +4,7 @@ import player
 import cocos
 import itertools
 import enemy, random
-from splashes import DeathScreen
+from splashes import DeathScreen, WinScreen
 
 # directions (enum)
 DIRECTION_UP, DIRECTION_LEFT, DIRECTION_DOWN, DIRECTION_RIGHT = range(4)
@@ -104,9 +104,7 @@ class Game(object):
         # called when player enters a cell. May trigger some changes over the map.
         # returns list of NEW items to put on the map.
         if (xc,yc) == self._all_data.levels[self.levelnr].end_point:
-            print "finishing"
-            self.levelnr += 1
-            self.refresh_level()
+            self.win()
             return
 
         
@@ -139,16 +137,25 @@ class Game(object):
 
     def die(self):
         # Fuck U
-        cocos.director.director.push(DeathScreen())
-        self.restart()
+        cocos.director.director.replace(DeathScreen(self.restart()))
 
     def win(self):
-        cocos.director.director.push(WinScreen())
+        
+        cocos.director.director.replace(WinScreen(self.restart()))
 
     def restart(self):
-        self.levelnr = 0
-        (self.player.cell_x, self.player.cell_y) = self.get_start_point()
-        self.refresh_level()
+        
+        game = Game.instance()
+        game.load_from("level.dat")
+        viewer = maplayer.MapLayer()
+        game.maplayer = viewer
+        game.player = player.Player()
+        game.keystate = self.keystate
+
+        main_scene = cocos.scene.Scene(viewer)
+        main_scene.add(game.player)
+        return main_scene
+
     
     def refresh_level(self):
         print "Going to level", self.levelnr

@@ -1,5 +1,8 @@
 
 import cocos
+import gamelogic
+import maplayer
+import player
 
 class FullScreenSplash(cocos.scene.Scene):
     def __init__(self, main_scene, fname, time):
@@ -26,15 +29,16 @@ class InitialSplashScreen(FullScreenSplash):
 
 
 class DeathScreen(FullScreenSplash):
-    def __init__(self):
-        super(DeathScreen, self).__init__(None,"img/death.png", 4)
+    def __init__(self, main_scene):
+        super(DeathScreen, self).__init__(main_scene,"img/death.png", 4)
         
     def close(self, timedelta, scene):
-        cocos.director.director.pop()
+        cocos.director.director.replace(scene)
+
 
 class WinScreen(FullScreenSplash):
-    def __init__(self):
-        super(WinScreen, self).__init__(None,"img/win.png", 4)
+    def __init__(self,main_scene):
+        super(WinScreen, self).__init__(main_scene,"img/win.png", 4)
         
     def close(self, timedelta, scene):
-        cocos.director.director.pop(pop)
+        cocos.director.director.replace(scene)
