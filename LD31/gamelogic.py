@@ -146,8 +146,8 @@ class Game(object):
         self.matrix = self._all_data.levels[self.levelnr].matrix.copy()
         self.triggers = self._all_data.levels[self.levelnr].triggers.copy()
 
-        #for k,v in self.triggers:
-        #    print "@pos ",k, ""
+        for k,v in self.triggers.iteritems():
+            print "@pos ",k, " triggers block ",v.block_id," switch to ",v.newlevel
         end_x, end_y = self._all_data.levels[self.levelnr].end_point
         print "new end @",end_x, ",",end_y
         print "should start @",self._all_data.levels[self.levelnr].start_point
