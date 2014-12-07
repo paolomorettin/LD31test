@@ -1,4 +1,6 @@
 import cocos
+import pyglet
+from pyglet.gl.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
 import gamelogic
 
 class MapLayer(cocos.layer.ColorLayer):
@@ -23,7 +25,12 @@ class MapLayer(cocos.layer.ColorLayer):
                 cell = self.game.get_cell(x, y)
                 for side in range(4):
                     if cell.wall[side] == 1:
-                        wall = cocos.sprite.Sprite("img/wall.png")
+                        image = pyglet.resource.image("img/wall.png")
+                        glTexParameteri(image.texture.target,
+                                        GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+                        glTexParameteri(image.texture.target,
+                                        GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+                        wall = cocos.sprite.Sprite(image)
                         if side == gamelogic.DIRECTION_UP or side == gamelogic.DIRECTION_DOWN:
                             wall.rotation = 90
                         wall.position = self._get_sprite_drawing_coors(x, y, side)

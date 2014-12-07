@@ -1,4 +1,5 @@
 import cocos, pyglet
+from pyglet.gl.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
 import maplayer, gamelogic
 from pyglet.window import key
 
@@ -8,7 +9,14 @@ class Player(cocos.layer.Layer):
     def __init__(self):
         #super(Player, self).__init__(255,255,255,255)
         super(Player, self).__init__()
-        self.sprite = cocos.sprite.Sprite("img/player.png")
+                                
+        image = pyglet.resource.image("img/player.png")
+       
+        glTexParameteri(image.texture.target,
+                        GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glTexParameteri(image.texture.target,
+                        GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        self.sprite = cocos.sprite.Sprite(image)
         self.cell_x = 0
         self.cell_y = 0
         self.sprite.position = self._get_drawing_coors()
