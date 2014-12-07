@@ -26,6 +26,8 @@ class MapLayer(cocos.layer.Layer):
         self.add(self.map)
         self.update(False)
 
+        self.mystery_sound = cocos.audio.pygame.mixer.Sound("sounds/mystery.wav")
+
     def update_blocks(self, block_list):
         self.update(True)
 
@@ -37,6 +39,7 @@ class MapLayer(cocos.layer.Layer):
         """
         if animation:
             self.storm.activate()
+            self.mystery_sound.play()
             return
         new_batch = cocos.batch.BatchNode()
         for x in range(gamelogic.MAPSIZE[0]):
