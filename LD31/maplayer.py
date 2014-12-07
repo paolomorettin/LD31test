@@ -57,6 +57,8 @@ class MapLayer(cocos.layer.ColorLayer):
                         self.batchnode.add(wall)
 
         self.add(self.batchnode)
+        self.batchnode.do(cocos.actions.MoveTo((50,50), 5) + cocos.actions.MoveTo((-50,-50), 5))
+        self.do(cocos.actions.MoveTo((0,0), 5)+cocos.actions.FadeOutBLTiles((32,32),5))
 
 if __name__ == "__main__":
     import sys
