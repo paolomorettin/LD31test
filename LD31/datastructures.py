@@ -22,6 +22,8 @@ class LevelData:
     def __init__(self):
         self.matrix = {} # (int, int) -> int
         self.triggers = {} # (int, int) -> TriggerData
+        self.start_point = (None,None) # (int,int)
+        self.end_point = (None,None) # (int,int)
 
 class TriggerData:
     """ Trigger that is present in a block """

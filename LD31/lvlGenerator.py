@@ -181,6 +181,9 @@ if __name__ == '__main__' :
         l = LevelData()
         # so map
         l.matrix = matrix
+        # very points
+        l.start_point = g.start_point
+        l.end_point = g.end_point
         # such triggers
         for coord,id_b in g.triggers.items() :
             print "in level",i,"trigger at coord",coord, "will change", id_b, " to level ",i+1
