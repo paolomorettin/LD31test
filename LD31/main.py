@@ -11,7 +11,7 @@ if __name__ == "__main__":
     try:
         cocos.audio.pygame.music.load("sounds/music.wav")
         cocos.audio.pygame.music.play(-1)
-    except Error:
+    except Exception:
         print "Unable to play music"
 
     game = gamelogic.Game.instance()
