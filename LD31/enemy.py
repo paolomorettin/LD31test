@@ -24,6 +24,12 @@ class Enemy(cocos.layer.Layer):
         self.game = gamelogic.Game.instance()
 
         self.schedule(self.update)
+        self.target = self.__get_target()
+
+    def __get_target(self):
+        x = random.randint(0, gamelogic.MAPSIZE[0]-1)
+        y = random.randint(0, gamelogic.MAPSIZE[1]-1)
+        return x, y
 
     def _get_drawing_coors(self):
         base_x = maplayer.MapLayer.SPRITE_SIZE * self.cell_x
@@ -37,20 +43,49 @@ class Enemy(cocos.layer.Layer):
     def _movement_allowed(self, direction):
         return self.game.get_cell(self.cell_x, self.cell_y).wall[direction] == 0
 
+    def compute_distance(self, x, y):
+        x_dis = abs(x - self.target[0])
+        y_dis = abs(y - self.target[1])
+        return x_dis + y_dis
+
+    def getting_closer(self, direction):
+        x = self.cell_x
+        y = self.cell_y
+        actual_dis = self.compute_distance(x, y)
+        if direction == gamelogic.DIRECTION_LEFT: x -= 1
+        elif direction == gamelogic.DIRECTION_UP: y += 1
+        elif direction == gamelogic.DIRECTION_DOWN: y -= 1
+        elif direction == gamelogic.DIRECTION_RIGHT: x += 1
+        future_dis = self.compute_distance(x, y)
+        return future_dis <= actual_dis
+
+
     def update(self, timedelta):
         if self.moving:
             return
 
-        ran_move = random.choice([gamelogic.DIRECTION_LEFT, gamelogic.DIRECTION_UP,
-                                  gamelogic.DIRECTION_RIGHT, gamelogic.DIRECTION_DOWN])
+        good_moves = []
+        if self._movement_allowed(gamelogic.DIRECTION_LEFT) and self.getting_closer(gamelogic.DIRECTION_LEFT):
+            good_moves.append(gamelogic.DIRECTION_LEFT)
+        if self._movement_allowed(gamelogic.DIRECTION_RIGHT) and self.getting_closer(gamelogic.DIRECTION_RIGHT):
+            good_moves.append(gamelogic.DIRECTION_RIGHT)
+        if self._movement_allowed(gamelogic.DIRECTION_UP) and self.getting_closer(gamelogic.DIRECTION_UP):
+            good_moves.append(gamelogic.DIRECTION_UP)
+        if self._movement_allowed(gamelogic.DIRECTION_DOWN) and self.getting_closer(gamelogic.DIRECTION_DOWN):
+            good_moves.append(gamelogic.DIRECTION_DOWN)
+        if len(good_moves) == 0:
+            self.target = self.__get_target()
+            return
 
-        if ran_move == gamelogic.DIRECTION_LEFT and self._movement_allowed(gamelogic.DIRECTION_LEFT):
+        ran_move = random.choice(good_moves)
+
+        if ran_move == gamelogic.DIRECTION_LEFT:
             self.cell_x -= 1
-        elif ran_move == gamelogic.DIRECTION_UP and self._movement_allowed(gamelogic.DIRECTION_UP):
+        elif ran_move == gamelogic.DIRECTION_UP:
             self.cell_y += 1
-        elif ran_move == gamelogic.DIRECTION_DOWN and self._movement_allowed(gamelogic.DIRECTION_DOWN):
+        elif ran_move == gamelogic.DIRECTION_DOWN:
             self.cell_y -= 1
-        elif ran_move == gamelogic.DIRECTION_RIGHT and self._movement_allowed(gamelogic.DIRECTION_RIGHT):
+        elif ran_move == gamelogic.DIRECTION_RIGHT:
             self.cell_x += 1
 
         self.moving = True
