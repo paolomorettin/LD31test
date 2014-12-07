@@ -93,7 +93,6 @@ class MapLayer(cocos.layer.Layer):
                 for side in range(4):
                     if cell.wall[side] == 1:
                         wall = self.wall_builders[side](x, y)
-                        wall.color = MapLayer.LEVEL_COLORS[cell.style]
                         new_batch.add(wall)
         if not animation:
             if self.block[idx]:
