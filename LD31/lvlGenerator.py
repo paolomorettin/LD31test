@@ -2,21 +2,25 @@ from random import shuffle
 from datastructures import *
 
 class Graph :
-    def __init__(self,size,start_point,end_point,min_steps=1) :
+    def __init__(self,size,start_point,end_point,min_steps=1,block_to_keep=None,distance=0.5) :
 
         self.start_point = start_point
         self.end_point = end_point
         self.size = size
 
         # divides the grid in blocks (3x2)
-        self.blocks = []
         block_coords = [((0,8),(0,9)),((9,16),(0,9)),((17,25),(0,9)),((0,8),(10,19)),((9,16),(10,19)),((17,25),(10,19))]
+        self.blocks = []
+        id_to_block = {}
+
+        i = 0
         for dx,dy in block_coords :
             self.blocks.append([])
             for y in xrange(dy[0],dy[1]+1) :
                 for x in xrange(dx[0],dx[1]+1) :
                     self.blocks[-1].append( (x,y) )
-
+                    id_to_block[(x,y)] = i
+            i += 1
 
 
         # generates the path from start_point to end_point with a random walk of length >= min_steps
@@ -27,11 +31,23 @@ class Graph :
             self.edges = [] 
             for x in xrange(size[0]) :
                 for y in xrange(size[1]) :
-                    self.nodes[(x,y)] = {'candidate':True, 'color':'white'}    
+                    self.nodes[(x,y)] = {'candidate':True, 'color':'white'}
+                    if block_to_keep != None and (x,y) in self.blocks[block_to_keep] : # if this block must be kept as-it-is.
+                        self.nodes[(x,y)]['candidate'] = False
     
-            ok = self.randomWalk(start_point,end_point) and len(self.edges) >= min_steps
+            ok = self.randomWalk(self.start_point,self.end_point) and len(self.edges) >= min_steps
 
+        
         # TRIGGERS
+        steps = int(len(self.edges)*distance)
+        n = self.start_point
+        i = 0
+        while i < steps :
+            n = [y for x,y in self.edges if x == n][0]
+            i += 1
+        self.triggers = { n : range(len(self.blocks)) }
+
+        '''
         self.triggers = {}
         self.main_path = list(self.edges)
 
@@ -60,13 +76,18 @@ class Graph :
         # the remaining blocks are triggered by an end_point trigger (end_point block included)
         blocks_left = list(set(range(len(self.blocks)))-blocks_triggered)
         self.triggers[n] = blocks_left
+        '''
                 
         # generates the misleading paths by connecting leftover nodes to the main path
         while len([n for n in self.nodes if self.nodes[n]['color'] == 'white']) > 0 :
-            nodes_in_path = [n for n in self.nodes if self.nodes[n]['color'] != 'white' and len([y for y in self.neighbors(n) if self.nodes[y]['color'] == 'white'])>0]
+            nodes_in_path = [n for n in self.nodes if self.nodes[n]['color'] != 'white']
+            nodes_in_path = [n for n in nodes_in_path if len([y for y in self.neighbors(n) if self.nodes[y]['color'] == 'white'])>0]
+
             shuffle(nodes_in_path)
             new_x = nodes_in_path[0]
             choices = [y for y in self.neighbors(new_x) if self.nodes[y]['color'] == 'white']
+            if block_to_keep != None :
+                choices = [y for y in choices if not y in self.blocks[block_to_keep]]
             shuffle(choices)
             new_y = choices[0]
             self.nodes[new_y]['color'] = 'grey'
@@ -106,27 +127,7 @@ class Graph :
             
         # dead end :(
         return False
-    
-    def pp(self) :
-        s1 = ''
-        s2 = ''
-        for x in xrange(self.size[0]) :
-            for y in xrange(self.size[1]) :
-                if self.nodes[(x,y)]['color'] == 'black' :
-                    s1+='#'
-                else :
-                    s1+=' '
-                if self.nodes[(x,y)]['candidate'] :
-                    s2 += '*'
-                else :
-                    s2 += ' '
-            s1 +='\n'
-            s2+='\n'
-        print s1
-        print ""
-        print s2
-        print "EDGES: " + str(self.edges)
-                
+
 
     def graphToMatrix(self) :
 
@@ -169,21 +170,9 @@ def firstLevel(size) :
             else :
                 l.matrix[(x,y)] = 0
 
-    s = ''
-    for y in xrange(max(map(lambda x:x[1],l.matrix.keys()))) :
-        for x in xrange(max(map(lambda x:x[0],l.matrix.keys()))) :
-            if l.matrix[(x,y)] == 0 :
-                s += ' '
-            else : 
-                s += '#'
-        s += '\n'
-
-    print s
-    l.triggers[l.end_point] = TriggerData([0,1,2,3,4,5],1)
+    l.triggers[(int(size[0]/2),int(size[1]/2))] = TriggerData([0,1,2,3,4,5],1)
     
     return l
-
-
 
 if __name__ == '__main__' :
 
@@ -193,11 +182,11 @@ if __name__ == '__main__' :
     lovely_hardcoded_size = (26,20)
     number_of_levels = 4
     game_data.levels.append( firstLevel(lovely_hardcoded_size) )
-    starting_points = [game_data.levels[-1].end_point,(25,19),(0,19),(25,0),(0,0)]
 
-    for i in xrange(number_of_levels) :
-        sp = starting_points[i]
-        ep = starting_points[i+1]
+    for i in xrange(1,number_of_levels) :
+        print game_data.levels[-1].triggers.keys()
+        sp = game_data.levels[-1].triggers.keys()[0]
+        ep = game_data.levels[-1].end_point
         g = Graph(lovely_hardcoded_size,sp,ep)
         matrix = g.graphToMatrix()
         '''
