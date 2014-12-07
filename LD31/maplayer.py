@@ -8,11 +8,6 @@ class MapLayer(cocos.layer.Layer):
     SPRITE_SIZE = 30
     WALL_SIZE = 5
 
-    BLOCK_NEIGHBOUR = [{1, 3}, {0, 2, 4}, {1, 5},
-                       {0, 4}, {1, 3, 5}, {2, 4}]
-
-    LEVEL_COLORS = [(255, 255, 255), (255, 0, 0), (0, 255, 0), (0, 0, 255)]
-
     def __init__(self):
         super(MapLayer, self).__init__()
         self.game = gamelogic.Game.instance()
@@ -24,34 +19,48 @@ class MapLayer(cocos.layer.Layer):
         self.storm = Storm()
         self.add(self.storm, z=1)
 
-        self.block = [None] * 6
-
         self.wall_builders = [self.__wall_top, self.__wall_left,
                               self.__wall_bottom, self.__wall_right]
 
-        for i in range(6):
-            self.update_block(i, False)
+        self.map = cocos.batch.BatchNode()
+        self.add(self.map)
+        self.update(False)
 
     def update_blocks(self, block_list):
+        self.update(True)
+
+    def update(self, animation=True):
         """
         :type block_list:   list of int
         :param block_list:  IDs of the blocks which need to be updated
         :return:
         """
-        neighbours = set()
-        for block_id in block_list:
-            self.update_block(block_id, True)
-            neighbours.update(MapLayer.BLOCK_NEIGHBOUR[block_id])
-        neighbours -= set(block_list)
-        for neigh in neighbours:
-            self.update_block(neigh, False)
+        if animation:
+            self.storm.activate()
+            return
+        new_batch = cocos.batch.BatchNode()
+        for x in range(gamelogic.MAPSIZE[0]):
+            for y in range(gamelogic.MAPSIZE[1]):
+                cell = self.game.get_cell(x, y)
+                if cell.type == gamelogic.CELLTYPE_END:
+                    end_flag = self.__load_sprite("img/end.png")
+                    x_pos = x * MapLayer.SPRITE_SIZE + MapLayer.SPRITE_SIZE / 2
+                    y_pos = y * MapLayer.SPRITE_SIZE + MapLayer.SPRITE_SIZE / 2
+                    end_flag.position = x_pos, y_pos
+                    new_batch.add(end_flag)
+                for side in range(4):
+                    if cell.wall[side] == 1:
+                        wall = self.wall_builders[side](x, y)
+                        new_batch.add(wall)
+        self.remove(self.map)
+        self.add(new_batch)
+        self.map = new_batch
 
     def __load_sprite(self, path):
         img = pyglet.resource.image(path)
         glTexParameteri(img.texture.target, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTexParameteri(img.texture.target, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         return cocos.sprite.Sprite(img)
-
 
     def __wall_top(self, x, y):
         wall = self.__load_sprite("img/ice_mid2.png")
@@ -79,33 +88,6 @@ class MapLayer(cocos.layer.Layer):
         cell_center_x = startx + (endx - startx) / 2
         cell_center_y = starty + (endy - starty) / 2
         return cell_center_x * MapLayer.SPRITE_SIZE, cell_center_y * MapLayer.SPRITE_SIZE
-
-
-    def __move_sprite(self, sprite, posx, posy):
-        sprite.do()
-
-    def update_block(self, idx, animation=False):
-        if animation:
-            self.storm.activate(idx)
-            return
-        new_batch = cocos.batch.BatchNode()
-        startx, endx, starty, endy = self.game.get_block_coords(idx)
-        for x in range(startx, endx):
-            for y in range(starty, endy):
-                cell = self.game.get_cell(x, y)
-                if cell.type == gamelogic.CELLTYPE_END:
-                    end_flag = self.__load_sprite("img/end.png")
-                    x_pos = x * MapLayer.SPRITE_SIZE + MapLayer.SPRITE_SIZE / 2
-                    y_pos = y * MapLayer.SPRITE_SIZE + MapLayer.SPRITE_SIZE / 2
-                    end_flag.position = x_pos, y_pos
-                    new_batch.add(end_flag)
-                for side in range(4):
-                    if cell.wall[side] == 1:
-                        wall = self.wall_builders[side](x, y)
-                        new_batch.add(wall)
-        self.add(new_batch)
-        if self.block[idx]: self.remove(self.block[idx])
-        self.block[idx] = new_batch
 
     def _get_sprite_drawing_coors(self, cell_x, cell_y, side):
         base_x = cell_x * MapLayer.SPRITE_SIZE
@@ -144,9 +126,9 @@ class Storm(cocos.sprite.Sprite):
         self.scale = 3
         self.position = (-1000, 300)
 
-    def activate(self, idx):
+    def activate(self):
         self.position = (-1000, 300)
         self.do(cocos.actions.MoveTo((400, 300), 3) +\
-                cocos.actions.CallFunc(self.parent.update_block, idx, False) +\
+                cocos.actions.CallFunc(self.parent.update, False) +\
                 cocos.actions.CallFunc(self.parent.add_enemies) +\
                 cocos.actions.MoveTo((2000, 300), 3))
