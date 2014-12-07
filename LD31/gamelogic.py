@@ -43,8 +43,8 @@ class Game(object):
         self.cell_cache = {}
         self._all_data = None
         self.triggers ={}
-        self.levelnr = -1
-        self.blocks_state = [-1]*6
+        self.levelnr = 0
+        self.blocks_state = [0]*6
         # other classes. Set my the main when they are initialized
         self.maplayer = None
         self.keystate = None
@@ -55,7 +55,7 @@ class Game(object):
         self._all_data = GameMapData.load(fname)
         self.matrix = self._all_data.levels[0].matrix.copy()
         self.triggers = self._all_data.levels[0].triggers.copy()
-        self.level_finished()
+        self.refresh_level()
 
     def get_start_point(self):
         return self._all_data.levels[self.levelnr].start_point
@@ -104,7 +104,8 @@ class Game(object):
         # returns list of NEW items to put on the map.
         if (xc,yc) == self._all_data.levels[self.levelnr].end_point:
             print "finishing"
-            self.level_finished()
+            self.levelnr += 1
+            self.refresh_level()
             return
 
         if (xc,yc) not in self.triggers:
@@ -130,8 +131,7 @@ class Game(object):
         del self.triggers[(xc,yc)]
         return []
 
-    def level_finished(self):
-        self.levelnr += 1
+    def refresh_level(self):
         print "Going to level", self.levelnr
         newlevel = self._all_data.levels[self.levelnr]
         dirty_blocks = set()
@@ -140,9 +140,14 @@ class Game(object):
             print "Block ", idx, "shows level", bstate
             if bstate != self.levelnr:
                 print "--> Updating! "
-                self.update_view(idx)
                 self.blocks_state[idx] = self.levelnr
                 dirty_blocks.add(idx)
+
+        self.matrix = self._all_data.levels[self.levelnr].matrix.copy()
+        self.triggers = self._all_data.levels[self.levelnr].triggers.copy()
+
+        #for k,v in self.triggers:
+        #    print "@pos ",k, ""
         end_x, end_y = self._all_data.levels[self.levelnr].end_point
         print "new end @",end_x, ",",end_y
         print "should start @",self._all_data.levels[self.levelnr].start_point
