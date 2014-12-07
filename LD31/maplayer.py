@@ -16,8 +16,7 @@ class MapLayer(cocos.layer.Layer):
         self.back.position = (400, 300)
         self.add(self.back)
 
-        self.storm = Storm()
-        self.add(self.storm, z=1)
+        self.storm = None
 
         self.wall_builders = [self.__wall_top, self.__wall_left,
                               self.__wall_bottom, self.__wall_right]
@@ -38,6 +37,9 @@ class MapLayer(cocos.layer.Layer):
         :return:
         """
         if animation:
+            if self.storm is None:
+                self.storm = Storm(self)
+                self.parent.add(self.storm, z=1)
             self.storm.activate()
             self.mystery_sound.play()
             return
@@ -121,17 +123,18 @@ class MapLayer(cocos.layer.Layer):
                                   random.randint(0, gamelogic.MAPSIZE[1]-1)]))
 
 class Storm(cocos.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, maplayer):
         img = pyglet.resource.image("img/cloud.png")
         glTexParameteri(img.texture.target, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTexParameteri(img.texture.target, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         super(Storm, self).__init__(img)
         self.scale = 3
+        self.maplayer = maplayer
         self.position = (-1000, 300)
 
     def activate(self):
         self.position = (-1000, 300)
         self.do(cocos.actions.MoveTo((400, 300), 3) +\
-                cocos.actions.CallFunc(self.parent.update, False) +\
-                cocos.actions.CallFunc(self.parent.add_enemies) +\
+                cocos.actions.CallFunc(self.maplayer.update, False) +\
+                cocos.actions.CallFunc(self.maplayer.add_enemies) +\
                 cocos.actions.MoveTo((2000, 300), 3))
