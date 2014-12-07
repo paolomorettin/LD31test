@@ -84,7 +84,7 @@ class Game(object):
         return None # WTF?
 
     def update_view(self, bid):
-        newlevel = self._all_data.levels[self.levelnr+1]
+        newlevel = self._all_data.levels[self.blocks_state[bid]]
         # x1 y1 x2 y2 are in cell space
         (x1, x2, y1, y2) =  self.get_block_coords(bid)
 
@@ -113,6 +113,7 @@ class Game(object):
         print "TRIGGER"
         newlevel = self._all_data.levels[trigger.newlevel]
         for bid in trigger.block_id:
+            self.blocks_state[bid] = trigger.newlevel
             self.update_view(bid)
             # survived_triggers = {t for t in self.triggers
             #                      if not (t.from_cell[0] >= x1
