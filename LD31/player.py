@@ -18,8 +18,7 @@ class Player(cocos.layer.Layer):
         glTexParameteri(image.texture.target,
                         GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         self.sprite = cocos.sprite.Sprite(image)
-        self.cell_x = 0
-        self.cell_y = 0
+        (self.cell_x,self.cell_y) = gamelogic.Game.instance().get_start_point()
         self.sprite.position = self._get_drawing_coors()
         self.add(self.sprite)
         self.moving = False # currently moving

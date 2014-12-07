@@ -60,10 +60,11 @@ class Game(object):
             for y in range(MAPSIZE[1]):
                 self.current_cell_level[(x,y)] = 0
         pass
-
-    def start(self):
         self.level_finished()
 
+    def get_start_point(self):
+        return self._all_data.levels[self.levelnr].start_point
+        
     def get_cell(self,x,y):
         # returns the Cell at (x,y) or None
         c = Cell()
