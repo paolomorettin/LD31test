@@ -20,11 +20,16 @@ class MapLayer(cocos.layer.Layer):
         self.back.position = (400, 300)
         self.add(self.back)
 
+        self.storm = Storm()
+        self.add(self.storm, z=1)
+
         self.block = [None] * 6
+
         self.wall_builders = [self.__wall_top, self.__wall_left,
                               self.__wall_bottom, self.__wall_right]
+
         for i in range(6):
-            self.__update_block(i, False)
+            self.update_block(i, False)
 
     def update_blocks(self, block_list):
         """
@@ -34,11 +39,11 @@ class MapLayer(cocos.layer.Layer):
         """
         neighbours = set()
         for block_id in block_list:
-            self.__update_block(block_id, True)
+            self.update_block(block_id, True)
             neighbours.update(MapLayer.BLOCK_NEIGHBOUR[block_id])
         neighbours -= set(block_list)
         for neigh in neighbours:
-            self.__update_block(neigh, False)
+            self.update_block(neigh, False)
 
     def __load_sprite(self, path):
         img = pyglet.resource.image(path)
@@ -78,7 +83,10 @@ class MapLayer(cocos.layer.Layer):
     def __move_sprite(self, sprite, posx, posy):
         sprite.do()
 
-    def __update_block(self, idx, animation=False):
+    def update_block(self, idx, animation=False):
+        if animation:
+            self.storm.activate(idx)
+            return
         new_batch = cocos.batch.BatchNode()
         startx, endx, starty, endy = self.game.get_block_coords(idx)
         for x in range(startx, endx):
@@ -94,20 +102,7 @@ class MapLayer(cocos.layer.Layer):
                     if cell.wall[side] == 1:
                         wall = self.wall_builders[side](x, y)
                         new_batch.add(wall)
-        if not animation:
-            if self.block[idx]:
-                self.remove(self.block[idx])
-            self.add(new_batch)
-        else:
-            clouds = self.__load_sprite("img/cloud.png")
-            cloud_x, cloud_y = self.__get_center(startx, endx, starty, endy)
-            clouds.position = (cloud_x-1000, cloud_y)
-            self.add(clouds, z=1)
-            clouds.do(cocos.actions.MoveTo((cloud_x, cloud_y), 3) +\
-                      cocos.actions.CallFunc(self.remove, self.block[idx]) +\
-                      cocos.actions.CallFunc(self.add, new_batch) +\
-                      cocos.actions.MoveTo((cloud_x+1000, cloud_y), 3))
-
+        self.add(new_batch)
         self.block[idx] = new_batch
 
     def _get_sprite_drawing_coors(self, cell_x, cell_y, side):
@@ -133,17 +128,17 @@ class MapLayer(cocos.layer.Layer):
         offset = MapLayer.SPRITE_SIZE / 2
         return base_x + offset, base_y + offset
 
-if __name__ == "__main__":
-    import sys
-    if len(sys.argv) == 1 or sys.argv[1] != "-debug":
-        print "This class is not intended to be run in a main file."
-        print "However, if you just want to run a test, use -debug option."
-        sys.exit(0)
-    cocos.director.director.init(width=800, height=600)
-    g =gamelogic.Game.instance()
-    g.load_from("level.dat")
-    test_map = MapLayer()
-    test = cocos.scene.Scene(test_map)
-    test_map.update_view(0,0,gamelogic.MAPSIZE[0],gamelogic.MAPSIZE[1])
-    cocos.director.director.run(test)
+class Storm(cocos.sprite.Sprite):
+    def __init__(self):
+        img = pyglet.resource.image("img/cloud.png")
+        glTexParameteri(img.texture.target, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glTexParameteri(img.texture.target, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        super(Storm, self).__init__(img)
+        self.scale = 3
+        self.position = (-1000, 300)
 
+    def activate(self, idx):
+        self.position = (-1000, 300)
+        self.do(cocos.actions.MoveTo((400, 300), 3) +\
+                self.parent.do(cocos.actions.CallFunc(self.parent.update_block, idx, False)) +\
+                cocos.actions.MoveTo((1000, 300), 3))
