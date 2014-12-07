@@ -41,9 +41,6 @@ class Enemy(cocos.layer.Layer):
     def _movement_allowed(self, direction):
         return self.game.get_cell(self.cell_x, self.cell_y).wall[direction] == 0
 
-    def _movement_allowed(self, direction):
-        return self.game.get_cell(self.cell_x, self.cell_y).wall[direction] == 0
-
     def compute_distance(self, x, y):
         x_dis = abs(x - self.target[0])
         y_dis = abs(y - self.target[1])
