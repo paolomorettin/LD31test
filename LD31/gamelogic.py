@@ -108,14 +108,32 @@ class Game(object):
             self.refresh_level()
             return
 
+        
         if (xc,yc) not in self.triggers:
             return
         trigger = self.triggers[(xc,yc)]
         print "TRIGGER"
         newlevel = self._all_data.levels[trigger.newlevel]
-        self.refresh_level()
+        for bid in trigger.block_id:
+            self.blocks_state[bid] = trigger.newlevel
+            self.update_view(bid)
+            # survived_triggers = {t for t in self.triggers
+            #                      if not (t.from_cell[0] >= x1
+            #                              and t.from_cell[1] >= y1
+            #                              and t.to_cell[0] <= x2
+            #                              and t.to_cell[1] <= y2)}
 
-        del self.triggers[(xc,yc)]
+            #new_triggers.update(survived_triggers)
+            #self.triggers = survived_triggers
+
+        end_x, end_y = self._all_data.levels[self.levelnr].end_point
+        self.matrix[(end_x*2+1, end_y*2+1)] = CELLTYPE_END
+
+        self.triggers = newlevel.triggers.copy()
+        
+        if self.maplayer is not None:
+            self.maplayer.update_blocks(trigger.block_id)
+
         return []
 
     def refresh_level(self):
