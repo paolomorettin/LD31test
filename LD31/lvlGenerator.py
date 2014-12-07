@@ -12,9 +12,12 @@ class Graph :
         self.blocks = []
         block_coords = [((0,8),(0,9)),((9,16),(0,9)),((17,25),(0,9)),((0,8),(10,19)),((9,16),(10,19)),((17,25),(10,19))]
         for dx,dy in block_coords :
+            self.blocks.append([])
             for y in xrange(dy[0],dy[1]+1) :
                 for x in xrange(dx[0],dx[1]+1) :
-                    self.blocks.append( (x,y) )
+                    self.blocks[-1].append( (x,y) )
+
+
 
         # generates the path from start_point to end_point with a random walk of length >= min_steps
         ok = False
@@ -29,7 +32,7 @@ class Graph :
             ok = self.randomWalk(start_point,end_point) and len(self.edges) >= min_steps
 
         # TRIGGERS
-        self.triggers = []
+        self.triggers = {}
         self.main_path = list(self.edges)
 
         # for each node in the main path, calculates the blocks that won't be visited again by backward-traversing the path
@@ -50,13 +53,13 @@ class Graph :
             candidates = [b for b in self.nodes[n]['btwbva'] if not b in blocks_triggered]
             if len(candidates) > 0 :
                 bt = candidates[0]
-                self.triggers.append( (n,[bt]) )
+                self.triggers[n] = [bt]
                 blocks_triggered.add(bt)
             n = [y for x,y in self.edges if x == n][0]
 
         # the remaining blocks are triggered by an end_point trigger (end_point block included)
         blocks_left = list(set(range(len(self.blocks)))-blocks_triggered)
-        self.triggers.append( (n,blocks_left) )
+        self.triggers[n] = blocks_left
                 
         # generates the misleading paths by connecting leftover nodes to the main path
         while len([n for n in self.nodes if self.nodes[n]['color'] == 'white']) > 0 :
@@ -162,7 +165,7 @@ if __name__ == '__main__' :
         ep = starting_points[i+1]
         g = Graph(lovely_hardcoded_size,sp,ep)
         matrix = g.graphToMatrix()
-
+        '''
         s = 'LEVEL {}\n'.format(str(i))
         for y in xrange(max(map(lambda x:x[1],matrix.keys()))) :
             for x in xrange(max(map(lambda x:x[0],matrix.keys()))) :
@@ -173,12 +176,13 @@ if __name__ == '__main__' :
             s += '\n'
 
         print s
-
+        '''
+        print g.triggers
         l = LevelData()
         # so map
         l.matrix = matrix
         # such triggers
-        for coord,id_b in g.triggers :
+        for coord,id_b in g.triggers.items() :
             l.triggers[coord] = TriggerData(id_b,i+1)
 
         game_data.levels.append(l)
