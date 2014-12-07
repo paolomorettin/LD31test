@@ -63,7 +63,7 @@ class Game(object):
     def get_cell(self,x,y):
         # returns the Cell at (x,y) or None
         c = Cell()
-        c.style = self.get_coords_block(x, y)
+        c.style = self.blocks_state[self.get_coords_block(x, y)]
         c.type = self.matrix[(x*2+1, y*2+1)]
         c.wall[DIRECTION_UP] =    self.matrix[(x*2+1, y*2+2)]
         c.wall[DIRECTION_DOWN] =  self.matrix[(x*2+1, y*2+0)]
