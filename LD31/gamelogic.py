@@ -40,7 +40,6 @@ class Game(object):
     def __init__(self):
         print "Creating a new Game."
         self.matrix = {}
-        self.current_cell_level = {}
         self.cell_cache = {}
         self._all_data = None
         self.triggers ={}
@@ -56,10 +55,6 @@ class Game(object):
         self._all_data = GameMapData.load(fname)
         self.matrix = self._all_data.levels[0].matrix.copy()
         self.triggers = self._all_data.levels[0].triggers.copy()
-        for x in range(MAPSIZE[0]):
-            for y in range(MAPSIZE[1]):
-                self.current_cell_level[(x,y)] = 0
-        pass
         self.level_finished()
 
     def get_start_point(self):
@@ -68,7 +63,7 @@ class Game(object):
     def get_cell(self,x,y):
         # returns the Cell at (x,y) or None
         c = Cell()
-        c.style = self.current_cell_level[(x,y)]
+        c.style = self.get_coords_block(x, y)
         c.type = self.matrix[(x*2+1, y*2+1)]
         c.wall[DIRECTION_UP] =    self.matrix[(x*2+1, y*2+2)]
         c.wall[DIRECTION_DOWN] =  self.matrix[(x*2+1, y*2+0)]
