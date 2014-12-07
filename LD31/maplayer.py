@@ -87,6 +87,8 @@ class MapLayer(cocos.layer.Layer):
         if animation:
             self.storm.activate(idx)
             return
+        #import pdb
+        #pdb.set_trace()
         new_batch = cocos.batch.BatchNode()
         startx, endx, starty, endy = self.game.get_block_coords(idx)
         for x in range(startx, endx):
@@ -103,6 +105,7 @@ class MapLayer(cocos.layer.Layer):
                         wall = self.wall_builders[side](x, y)
                         new_batch.add(wall)
         self.add(new_batch)
+        if self.block[idx]: self.remove(self.block[idx])
         self.block[idx] = new_batch
 
     def _get_sprite_drawing_coors(self, cell_x, cell_y, side):
@@ -140,5 +143,5 @@ class Storm(cocos.sprite.Sprite):
     def activate(self, idx):
         self.position = (-1000, 300)
         self.do(cocos.actions.MoveTo((400, 300), 3) +\
-                self.parent.do(cocos.actions.CallFunc(self.parent.update_block, idx, False)) +\
-                cocos.actions.MoveTo((1000, 300), 3))
+                cocos.actions.CallFunc(self.parent.update_block, idx, False) +\
+                cocos.actions.MoveTo((2000, 300), 3))
