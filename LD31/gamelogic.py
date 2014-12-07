@@ -113,20 +113,7 @@ class Game(object):
         trigger = self.triggers[(xc,yc)]
         print "TRIGGER"
         newlevel = self._all_data.levels[trigger.newlevel]
-        for bid in trigger.block_id:
-            self.blocks_state[bid] = trigger.newlevel
-            self.update_view(bid)
-            # survived_triggers = {t for t in self.triggers
-            #                      if not (t.from_cell[0] >= x1
-            #                              and t.from_cell[1] >= y1
-            #                              and t.to_cell[0] <= x2
-            #                              and t.to_cell[1] <= y2)}
-
-            #new_triggers.update(survived_triggers)
-            #self.triggers = survived_triggers
-
-        if self.maplayer is not None:
-            self.maplayer.update_blocks(trigger.block_id)
+        self.refresh_level()
 
         del self.triggers[(xc,yc)]
         return []
@@ -136,6 +123,7 @@ class Game(object):
         newlevel = self._all_data.levels[self.levelnr]
         dirty_blocks = set()
         self.triggers = newlevel.triggers
+
         for idx, bstate in itertools.izip(itertools.count(0),self.blocks_state):
             print "Block ", idx, "shows level", bstate
             if bstate != self.levelnr:
