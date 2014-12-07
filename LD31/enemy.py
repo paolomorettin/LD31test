@@ -4,10 +4,10 @@ from pyglet.gl.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_
 import maplayer, gamelogic
 from pyglet.window import key
 
-class Player(cocos.layer.Layer):
+class Enemy(cocos.layer.Layer):
     PLAYER_SIZE = 26
 
-    def __init__(self):
+    def __init__(self,position) :
         #super(Player, self).__init__(255,255,255,255)
         super(Player, self).__init__()
                                 
@@ -18,7 +18,7 @@ class Player(cocos.layer.Layer):
         glTexParameteri(image.texture.target,
                         GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         self.sprite = cocos.sprite.Sprite(image)
-        (self.cell_x,self.cell_y) = gamelogic.Game.instance().get_start_point()
+        (self.cell_x,self.cell_y) = position
         self.sprite.position = self._get_drawing_coors()
         self.add(self.sprite)
         self.moving = False # currently moving
