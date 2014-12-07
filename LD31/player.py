@@ -38,7 +38,6 @@ class Player(cocos.layer.Layer):
     def update(self, timedelta):
         if self.moving:
             return
-        print "[player] moving mowing moving"
         keystate = gamelogic.Game.instance().keystate
         if keystate[key.LEFT] and self._movement_allowed(gamelogic.DIRECTION_LEFT):
             self.cell_x -= 1
@@ -50,10 +49,11 @@ class Player(cocos.layer.Layer):
             self.cell_x += 1
         else:
             return
+        print "[player] moving mowing moving to ", self.cell_x, ",",self.cell_y
 
         self.moving = True
         self.sprite.do(cocos.actions.MoveTo(self._get_drawing_coors(), 0.2) + cocos.actions.CallFunc(self.stopped_moving))
-        #self.game.enter_cell(self.cell_x, self.cell_y)
+        self.game.enter_cell(self.cell_x, self.cell_y)
 
     def stopped_moving(self):
         self.moving = False
