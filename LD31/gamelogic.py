@@ -2,7 +2,7 @@ from datastructures import GameMapData
 import maplayer
 import player
 import cocos
-
+import itertools
 
 # directions (enum)
 DIRECTION_UP, DIRECTION_LEFT, DIRECTION_DOWN, DIRECTION_RIGHT = range(4)
@@ -43,7 +43,9 @@ class Game(object):
         self.current_cell_level = {}
         self.cell_cache = {}
         self._all_data = None
-        self.triggers = {}
+        self.triggers ={}
+        self.levelnr = -1
+        self.blocks_state = [-1]*6
         # other classes. Set my the main when they are initialized
         self.maplayer = None
         self.keystate = None
@@ -58,6 +60,9 @@ class Game(object):
             for y in range(MAPSIZE[1]):
                 self.current_cell_level[(x,y)] = 0
         pass
+
+    def start(self):
+        self.level_finished()
 
     def get_cell(self,x,y):
         # returns the Cell at (x,y) or None
@@ -75,48 +80,79 @@ class Game(object):
         x1, x2, y1, y2 = data[idx]
         return (x1, x2+1, y1, y2+1)
 
-    def enter_cell(self,x,y):
+    def get_coords_block(self, x, y):
+        for i in range(6):
+            (x1, x2, y1, y2) =  self.get_block_coords(i)
+            if x >= x1 and y >= y1 and x <= x2 and y <= y2:
+                return i
+        return None # WTF?
+
+    def update_view(self, bid):
+        newlevel = self._all_data.levels[self.levelnr+1]
+        # x1 y1 x2 y2 are in cell space
+        (x1, x2, y1, y2) =  self.get_block_coords(bid)
+
+        # update the map for the target locations
+        for x in range(x1, x2):
+            for y in range(y1, y2):
+                # foreach cell, copy the cell inner value
+                self.matrix[(x*2+1, y*2+1)] = newlevel.matrix[(x*2+1, y*2+1)]
+                # and the surrounding walls
+                self.matrix[(x*2+2, y*2+1)] = newlevel.matrix[(x*2+2, y*2+1)]
+                self.matrix[(x*2,   y*2+1)] = newlevel.matrix[(x*2,   y*2+1)]
+                self.matrix[(x*2+1, y*2+2)] = newlevel.matrix[(x*2+1, y*2+2)]
+                self.matrix[(x*2+1, y*2  )] = newlevel.matrix[(x*2+1, y*2  )]
+
+    def enter_cell(self,xc,yc):
         # called when player enters a cell. May trigger some changes over the map.
         # returns list of NEW items to put on the map.
-        if (x,y) not in self.triggers:
+        if (xc,yc) == self._all_data.levels[self.levelnr].end_point:
+            print "finishing"
+            self.level_finished()
             return
-        trigger = self.triggers[(x,y)]
+
+        if (xc,yc) not in self.triggers:
+            return
+        trigger = self.triggers[(xc,yc)]
         print "TRIGGER"
         newlevel = self._all_data.levels[trigger.newlevel]
         for bid in trigger.block_id:
-            # x1 y1 x2 y2 are in cell space
-            (x1, x2, y1, y2) =  self.get_block_coords(bid)
-            
-            # update the map for the target locations
-            for x in range(x1, x2):
-                for y in range(y1, y2):
-                    # foreach cell, copy the cell inner value
-                    self.matrix[(x*2+1, y*2+1)] = newlevel.matrix[(x*2+1, y*2+1)]
-                    # and the surrounding walls
-                    self.matrix[(x*2+2, y*2+1)] = newlevel.matrix[(x*2+2, y*2+1)]
-                    self.matrix[(x*2,   y*2+1)] = newlevel.matrix[(x*2,   y*2+1)]
-                    self.matrix[(x*2+1, y*2+2)] = newlevel.matrix[(x*2+1, y*2+2)]
-                    self.matrix[(x*2+1, y*2  )] = newlevel.matrix[(x*2+1, y*2  )]
-
-            # todo: aggiungi i trigger nuovi
-            # # insert new triggers, if they are there
-            # new_triggers = {t for t in newlevel.triggers
-            #                 if t.from_cell[0] >= x1
-            #                 and t.from_cell[1] >= y1
-            #                 and t.to_cell[0] <= x2
-            #                 and t.to_cell[1] <= y2}
-            
+            self.update_view(bid)
             # survived_triggers = {t for t in self.triggers
             #                      if not (t.from_cell[0] >= x1
             #                              and t.from_cell[1] >= y1
             #                              and t.to_cell[0] <= x2
             #                              and t.to_cell[1] <= y2)}
-        
+
             #new_triggers.update(survived_triggers)
             #self.triggers = survived_triggers
 
             if self.maplayer is not None:
                 self.maplayer.update(bid, animation=False)
-
+        del self.triggers[(xc,yc)]
         return []
 
+    def level_finished(self):
+        self.levelnr += 1
+        print "Going to level", self.levelnr
+        newlevel = self._all_data.levels[self.levelnr]
+        dirty_blocks = set()
+        self.triggers = newlevel.triggers
+        for idx, bstate in itertools.izip(itertools.count(0),self.blocks_state):
+            print "Block ", idx, "shows level", bstate
+            if bstate != self.levelnr:
+                print "--> Updating! "
+                self.update_view(idx)
+                self.blocks_state[idx] = self.levelnr
+                dirty_blocks.add(idx)
+        end_x, end_y = self._all_data.levels[self.levelnr].end_point
+        print "new end @",end_x, ",",end_y
+        print "should start @",self._all_data.levels[self.levelnr].start_point
+        self.matrix[(end_x*2+1, end_y*2+1)] = CELLTYPE_END
+        end_block = self.get_coords_block(end_x, end_y)
+        dirty_blocks.add(end_block)
+        if self.maplayer is not None:
+            for i in dirty_blocks:
+                print "--> VIEWUPDATE ",i
+                self.maplayer.update(i, animation=False)
+        pass

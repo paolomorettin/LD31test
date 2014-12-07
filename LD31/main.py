@@ -16,6 +16,7 @@ if __name__ == "__main__":
 
     game = gamelogic.Game.instance()
     game.load_from("level.dat")
+    game.start() # this goes before view initialization, otherwise the view is updated as soon as it's created
     viewer = maplayer.MapLayer()
     game.maplayer = viewer
     game.player = player.Player()

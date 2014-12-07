@@ -24,6 +24,8 @@ class Player(cocos.layer.Layer):
         self.add(self.sprite)
         self.moving = False # currently moving
         self.game = gamelogic.Game.instance()
+
+        self.cheating = False
         
         self.schedule(self.update)
 
@@ -42,7 +44,11 @@ class Player(cocos.layer.Layer):
     def update(self, timedelta):
         if self.moving:
             return
+        
         keystate = gamelogic.Game.instance().keystate
+        if keystate[key.C]:
+            self.cheating = not self.cheating
+
         if keystate[key.LEFT] and self._movement_allowed(gamelogic.DIRECTION_LEFT):
             self.cell_x -= 1
         elif keystate[key.UP] and self._movement_allowed(gamelogic.DIRECTION_UP):
@@ -52,7 +58,19 @@ class Player(cocos.layer.Layer):
         elif keystate[key.RIGHT] and self._movement_allowed(gamelogic.DIRECTION_RIGHT):
             self.cell_x += 1
         else:
-            return
+            if self.cheating:
+                if keystate[key.LEFT]:
+                    self.cell_x -= 1
+                elif keystate[key.UP]:
+                    self.cell_y += 1
+                elif keystate[key.DOWN]:
+                    self.cell_y -= 1
+                elif keystate[key.RIGHT]:
+                    self.cell_x += 1
+                else:
+                    return
+            else:
+                return
         random.choice([self.moving_sound1, self.moving_sound2]).play()
         print "[player] moving mowing moving to ", self.cell_x, ",",self.cell_y
 
