@@ -6,7 +6,7 @@ class GameMapData:
     """ Holds the map of the entire game """
     def __init__(self):
         # levelnumber -> LevelData
-        self.levels = {} # int -> LevelData
+        self.levels = [] # int -> LevelData
 
     @staticmethod
     def load(fname):
@@ -21,14 +21,11 @@ class LevelData:
     """ All the data in a block """
     def __init__(self):
         self.matrix = {} # (int, int) -> int
-        self.triggers = {} # (int, int) -> TriggerDatax
+        self.triggers = {} # (int, int) -> TriggerData
 
 class TriggerData:
     """ Trigger that is present in a block """
-    def __init__(self):
-        # coordinates to change
-        self.from_cell = (0,0)
-        # end coordinates to change (inclusive). Must be >= from_cell
-        self.to_cell = (0,0)
-        self.newlevel = 0
+    def __init__(self,block_id,newlevel):
+        self.block_id = block_id
+        self.newlevel = newlevel
 
