@@ -44,7 +44,10 @@ class Game(object):
         self.cell_cache = {}
         self._all_data = None
         self.triggers = {}
+        # other classes. Set my the main when they are initialized
         self.maplayer = None
+        self.keystate = None
+        self.player = None
 
     def load_from(self, fname):
         # loads from the specified filename

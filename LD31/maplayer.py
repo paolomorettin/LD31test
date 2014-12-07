@@ -43,6 +43,8 @@ class MapLayer(cocos.layer.ColorLayer):
         :param endy:
         :return:
         """
+        self.batchnode = cocos.batch.BatchNode()
+        print "updating map"
         for x in range(startx, endx):
             for y in range(starty, endy):
                 cell = self.game.get_cell(x, y)
@@ -52,7 +54,9 @@ class MapLayer(cocos.layer.ColorLayer):
                         if side == gamelogic.DIRECTION_UP or side == gamelogic.DIRECTION_DOWN:
                             wall.rotation = 90
                         wall.position = self._get_sprite_drawing_coors(x, y, side)
-                        self.add(wall)
+                        self.batchnode.add(wall)
+
+        self.add(self.batchnode)
 
 if __name__ == "__main__":
     import sys

@@ -1,8 +1,8 @@
 import cocos, pyglet
 import maplayer, gamelogic
+from pyglet.window import key
 
 class Player(cocos.layer.Layer):
-    is_event_handler = True
     PLAYER_SIZE = 26
 
     def __init__(self):
@@ -13,9 +13,10 @@ class Player(cocos.layer.Layer):
         self.cell_y = 0
         self.sprite.position = self._get_drawing_coors()
         self.add(self.sprite)
-        self.curr_action = None
-        self.schedule_interval(self.update, 0.5)
-        self.game = None
+        self.moving = False # currently moving
+        self.game = gamelogic.Game.instance()
+        
+        self.schedule(self.update)
 
     def _get_drawing_coors(self):
         base_x = maplayer.MapLayer.SPRITE_SIZE * self.cell_x
@@ -27,27 +28,28 @@ class Player(cocos.layer.Layer):
         return self.game.get_cell(self.cell_x, self.cell_y).wall[direction] == 0
 
     def update(self, timedelta):
-        if not self.game: self.game = gamelogic.Game.instance()
-        if self.curr_action == pyglet.window.key.LEFT and self._movement_allowed(gamelogic.DIRECTION_LEFT):
-            self.cell_x -= 1
-        elif self.curr_action == pyglet.window.key.UP and self._movement_allowed(gamelogic.DIRECTION_UP):
-            self.cell_y += 1
-        elif self.curr_action == pyglet.window.key.DOWN and self._movement_allowed(gamelogic.DIRECTION_DOWN):
-            self.cell_y -= 1
-        elif self.curr_action == pyglet.window.key.RIGHT and self._movement_allowed(gamelogic.DIRECTION_RIGHT):
-            self.cell_x += 1
-        self.sprite.do(cocos.actions.MoveTo(self._get_drawing_coors(), 0.25))
-        self.game.enter_cell(self.cell_x, self.cell_y)
-
-    def on_key_press(self, key, modifiers):
-        if self.curr_action and self.curr_action != key:
+        if self.moving:
             return
-        valid_keys = {pyglet.window.key.LEFT, pyglet.window.key.UP, pyglet.window.key.DOWN, pyglet.window.key.RIGHT}
-        if key in valid_keys:
-            self.curr_action = key
+        print "[player] moving mowing moving"
+        keystate = gamelogic.Game.instance().keystate
+        if keystate[key.LEFT] and self._movement_allowed(gamelogic.DIRECTION_LEFT):
+            self.cell_x -= 1
+        elif keystate[key.UP] and self._movement_allowed(gamelogic.DIRECTION_UP):
+            self.cell_y += 1
+        elif keystate[key.DOWN] and self._movement_allowed(gamelogic.DIRECTION_DOWN):
+            self.cell_y -= 1
+        elif keystate[key.RIGHT] and self._movement_allowed(gamelogic.DIRECTION_RIGHT):
+            self.cell_x += 1
+        else:
+            return
 
-    def on_key_release(self, key, modifiers):
-        self.curr_action = None
+        self.moving = True
+        self.sprite.do(cocos.actions.MoveTo(self._get_drawing_coors(), 0.2) + cocos.actions.CallFunc(self.stopped_moving))
+        #self.game.enter_cell(self.cell_x, self.cell_y)
+
+    def stopped_moving(self):
+        self.moving = False
+
 
 if __name__ == "__main__":
     import sys

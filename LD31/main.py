@@ -2,6 +2,7 @@ import cocos
 import gamelogic
 import maplayer
 import player
+import pyglet
 
 if __name__ == "__main__":
     cocos.director.director.init(width=800, height=600)
@@ -9,7 +10,10 @@ if __name__ == "__main__":
     game.load_from("level.dat")
     viewer = maplayer.MapLayer()
     game.maplayer = viewer
-    player = player.Player()
+    game.player = player.Player()
+    game.keystate = pyglet.window.key.KeyStateHandler()
+    cocos.director.director.window.push_handlers(game.keystate)
+
     main_scene = cocos.scene.Scene(viewer)
-    main_scene.add(player)
+    main_scene.add(game.player)
     cocos.director.director.run(main_scene)
