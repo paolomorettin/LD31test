@@ -78,9 +78,9 @@ class Game(object):
     def enter_cell(self,x,y):
         # called when player enters a cell. May trigger some changes over the map.
         # returns list of NEW items to put on the map.
-        trigger = self.triggers[(x,y)]
-        if trigger is None:
+        if (x,y) not in self.triggers:
             return
+        trigger = self.triggers[(x,y)]
         print "TRIGGER"
         newlevel = self._all_data.levels[trigger.newlevel]
         for bid in trigger.block_id:
