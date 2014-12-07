@@ -41,7 +41,7 @@ class Enemy(cocos.layer.Layer):
         if self.moving:
             return
 
-        ran_move = random.choice([gamelogic.DIRECTION_LEFT, gamelogic.DIRECTION_RIGHT,
+        ran_move = random.choice([gamelogic.DIRECTION_LEFT, gamelogic.DIRECTION_UP,
                                   gamelogic.DIRECTION_RIGHT, gamelogic.DIRECTION_DOWN])
 
         if ran_move == gamelogic.DIRECTION_LEFT and self._movement_allowed(gamelogic.DIRECTION_LEFT):
