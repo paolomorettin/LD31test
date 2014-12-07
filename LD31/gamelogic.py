@@ -4,6 +4,7 @@ import player
 import cocos
 import itertools
 import enemy, random
+from splashes import DeathScreen
 
 # directions (enum)
 DIRECTION_UP, DIRECTION_LEFT, DIRECTION_DOWN, DIRECTION_RIGHT = range(4)
@@ -135,8 +136,23 @@ class Game(object):
         if self.maplayer is not None:
             self.maplayer.update_blocks(trigger.block_id)
 
+        self.die()
         return []
 
+    def die(self):
+        # Fuck U
+        cocos.director.director.push(DeathScreen())
+        self.restart()
+
+    def win(self):
+        cocos.director.director.push(WinScreen())
+
+    def restart(self):
+        self.levelnr = 0
+        newlevel = self._all_data.levels[self.levelnr]
+        (self.player.cell_x, self.player.cell_y) = self.get_start_point()
+        self.refresh_level()
+    
     def refresh_level(self):
         print "Going to level", self.levelnr
         newlevel = self._all_data.levels[self.levelnr]
