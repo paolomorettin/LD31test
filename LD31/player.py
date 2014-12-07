@@ -25,6 +25,7 @@ class Player(cocos.layer.Layer):
         self.game = gamelogic.Game.instance()
 
         self.cheating = False
+        self.controllable = True
         
         self.schedule(self.update)
 
@@ -41,9 +42,9 @@ class Player(cocos.layer.Layer):
         return self.game.get_cell(self.cell_x, self.cell_y).wall[direction] == 0
 
     def update(self, timedelta):
-        if self.moving:
+        if self.moving or not self.controllable:
             return
-        
+
         keystate = gamelogic.Game.instance().keystate
         if keystate[key.C]:
             self.cheating = not self.cheating
@@ -80,6 +81,12 @@ class Player(cocos.layer.Layer):
     def stopped_moving(self):
         self.moving = False
 
+    def disable_controls(self):
+        self.controllable = False
+
+    def enable_controls(self):
+        self.controllable = True
+        
 
 if __name__ == "__main__":
     import sys
