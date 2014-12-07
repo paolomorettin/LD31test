@@ -7,7 +7,7 @@ from pyglet.window import key
 class Enemy(cocos.layer.Layer):
     PLAYER_SIZE = 26
 
-    def __init__(self,position) :
+    def __init__(self, position) :
         super(Enemy, self).__init__()
                                 
         image = pyglet.resource.image("img/enemy.png")
@@ -23,11 +23,7 @@ class Enemy(cocos.layer.Layer):
         self.moving = False # currently moving
         self.game = gamelogic.Game.instance()
 
-        
         self.schedule(self.update)
-
-        self.moving_sound1 = cocos.audio.pygame.mixer.Sound("sounds/snow1.wav")
-        self.moving_sound2 = cocos.audio.pygame.mixer.Sound("sounds/snow2.wav")
 
     def _get_drawing_coors(self):
         base_x = maplayer.MapLayer.SPRITE_SIZE * self.cell_x
@@ -38,29 +34,27 @@ class Enemy(cocos.layer.Layer):
     def _movement_allowed(self, direction):
         return self.game.get_cell(self.cell_x, self.cell_y).wall[direction] == 0
 
+    def _movement_allowed(self, direction):
+        return self.game.get_cell(self.cell_x, self.cell_y).wall[direction] == 0
+
     def update(self, timedelta):
-        if self.moving or not self.controllable:
+        if self.moving:
             return
 
-        ran_move = random.choice['left','right','up','down']
+        ran_move = random.choice([gamelogic.DIRECTION_LEFT, gamelogic.DIRECTION_RIGHT,
+                                  gamelogic.DIRECTION_RIGHT, gamelogic.DIRECTION_DOWN])
 
-        if ran_move == 'left' :
+        if ran_move == gamelogic.DIRECTION_LEFT and self._movement_allowed(gamelogic.DIRECTION_LEFT):
             self.cell_x -= 1
-        elif ran_move == 'up' :
+        elif ran_move == gamelogic.DIRECTION_UP and self._movement_allowed(gamelogic.DIRECTION_UP):
             self.cell_y += 1
-        elif ran_move == 'down' :
+        elif ran_move == gamelogic.DIRECTION_DOWN and self._movement_allowed(gamelogic.DIRECTION_DOWN):
             self.cell_y -= 1
-        elif ran_move == 'right' :
+        elif ran_move == gamelogic.DIRECTION_RIGHT and self._movement_allowed(gamelogic.DIRECTION_RIGHT):
             self.cell_x += 1
-        else:
-            raise ValueError("what the fuck!?")
-
-        random.choice([self.moving_sound1, self.moving_sound2]).play()
-        print "[player] moving mowing moving to ", self.cell_x, ",",self.cell_y
 
         self.moving = True
         self.sprite.do(cocos.actions.MoveTo(self._get_drawing_coors(), 0.2) + cocos.actions.CallFunc(self.stopped_moving))
-        self.game.enter_cell(self.cell_x, self.cell_y)
 
     def stopped_moving(self):
         self.moving = False

@@ -2,6 +2,7 @@ import cocos
 import pyglet
 from pyglet.gl.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
 import gamelogic
+import random, enemy
 
 class MapLayer(cocos.layer.Layer):
     SPRITE_SIZE = 30
@@ -87,8 +88,6 @@ class MapLayer(cocos.layer.Layer):
         if animation:
             self.storm.activate(idx)
             return
-        #import pdb
-        #pdb.set_trace()
         new_batch = cocos.batch.BatchNode()
         startx, endx, starty, endy = self.game.get_block_coords(idx)
         for x in range(startx, endx):
@@ -131,6 +130,11 @@ class MapLayer(cocos.layer.Layer):
         offset = MapLayer.SPRITE_SIZE / 2
         return base_x + offset, base_y + offset
 
+    def add_enemies(self):
+        for idx in range(2):
+            self.add(enemy.Enemy([random.randint(0, gamelogic.MAPSIZE[0]-1),
+                                  random.randint(0, gamelogic.MAPSIZE[1]-1)]))
+
 class Storm(cocos.sprite.Sprite):
     def __init__(self):
         img = pyglet.resource.image("img/cloud.png")
@@ -144,4 +148,5 @@ class Storm(cocos.sprite.Sprite):
         self.position = (-1000, 300)
         self.do(cocos.actions.MoveTo((400, 300), 3) +\
                 cocos.actions.CallFunc(self.parent.update_block, idx, False) +\
+                cocos.actions.CallFunc(self.parent.add_enemies) +\
                 cocos.actions.MoveTo((2000, 300), 3))

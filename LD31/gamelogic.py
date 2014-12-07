@@ -3,6 +3,7 @@ import maplayer
 import player
 import cocos
 import itertools
+import enemy, random
 
 # directions (enum)
 DIRECTION_UP, DIRECTION_LEFT, DIRECTION_DOWN, DIRECTION_RIGHT = range(4)
