@@ -115,8 +115,8 @@ class Game(object):
             #new_triggers.update(survived_triggers)
             #self.triggers = survived_triggers
 
-            if self.maplayer is not None:
-                self.maplayer.update(bid, animation=False)
+        if self.maplayer is not None:
+            self.maplayer.update_blocks(trigger.block_id)
 
         return []
 

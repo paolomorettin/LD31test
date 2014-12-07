@@ -14,10 +14,24 @@ class MapLayer(cocos.layer.ColorLayer):
         super(MapLayer, self).__init__(255, 255, 255, 255)
         self.game = gamelogic.Game.instance()
         self.block = [None] * 6
-        for idx, b in enumerate(self.block):
-            self.update(idx, animation=False)
+        for i in range(6):
+            self.__update_block(i, False)
 
-    def update(self, idx, animation=False):
+    def update_blocks(self, block_list):
+        """
+        :type block_list:   list of int
+        :param block_list:  IDs of the blocks which need to be updated
+        :return:
+        """
+        neighbours = set()
+        for block_id in block_list:
+            self.__update_block(block_id, False)
+            neighbours.update(MapLayer.BLOCK_NEIGHBOUR[block_id])
+        neighbours -= set(block_list)
+        for neigh in neighbours:
+            self.__update_block(neigh, False)
+
+    def __update_block(self, idx, animation=False):
         new_batch = cocos.batch.BatchNode()
         startx, endx, starty, endy = self.game.get_block_coords(idx)
         for x in range(startx, endx):
