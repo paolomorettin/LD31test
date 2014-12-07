@@ -165,10 +165,22 @@ def firstLevel(size) :
 
     for y in xrange(size[1]*2 + 2) :
         for x in xrange(size[0]*2 + 2) :
-            if y != size[1]+1 :
+            if y != size[1]+1 or x == 0 or x == size[0]*2 :
                 l.matrix[(x,y)] = 1
             else :
                 l.matrix[(x,y)] = 0
+
+    s = ''
+    for y in xrange(max(map(lambda x:x[1],l.matrix.keys()))) :
+        for x in xrange(max(map(lambda x:x[0],l.matrix.keys()))) :
+            if l.matrix[(x,y)] == 0 :
+                s += ' '
+            else : 
+                s += '#'
+        s += '\n'
+
+    print s
+
 
     l.triggers[(int(size[0]/2),int(size[1]/2))] = TriggerData([0,1,2,3,4,5],1)
     
