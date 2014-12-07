@@ -1,3 +1,6 @@
+The splashscreen music is based upon a recording of monkeys screaming by TeamMasaka.
+Full recording can be downloaded from: http://freesound.org/people/TeamMasaka/sounds/197431/
+
 Files snow1.wav and snow2.wav are based upon Footstep_Snow4 by iujhu, freely available on freesound.org
 
 Background music is based upon DT3 by Robert del Naja, provided under the terms of the Creative Commons ‘NonCommercial-ShareAlike 4.0 International‘ license. That means you’re free to do whatever, as long as give credit, and what you make is free (i.e. non commercial).
