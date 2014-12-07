@@ -29,7 +29,7 @@ class MapLayer(cocos.layer.ColorLayer):
         """
         neighbours = set()
         for block_id in block_list:
-            self.__update_block(block_id, False)
+            self.__update_block(block_id, True)
             neighbours.update(MapLayer.BLOCK_NEIGHBOUR[block_id])
         neighbours -= set(block_list)
         for neigh in neighbours:
@@ -64,6 +64,15 @@ class MapLayer(cocos.layer.ColorLayer):
         wall.position = self._get_sprite_drawing_coors(x, y, gamelogic.DIRECTION_RIGHT)
         return wall
 
+    def __get_center(self, startx, endx, starty, endy):
+        cell_center_x = startx + (endx - startx) / 2
+        cell_center_y = starty + (endy - starty) / 2
+        return cell_center_x * MapLayer.SPRITE_SIZE, cell_center_y * MapLayer.SPRITE_SIZE
+
+
+    def __move_sprite(self, sprite, posx, posy):
+        sprite.do()
+
     def __update_block(self, idx, animation=False):
         new_batch = cocos.batch.BatchNode()
         startx, endx, starty, endy = self.game.get_block_coords(idx)
@@ -86,8 +95,15 @@ class MapLayer(cocos.layer.ColorLayer):
                 self.remove(self.block[idx])
             self.add(new_batch)
         else:
+            clouds = self.__load_sprite("img/cloud.png")
+            clouds.position = (0, 0)
+            self.add(clouds, z=1)
+            cloud_x, cloud_y = self.__get_center(startx, endx, starty, endy)
+            clouds.do(cocos.actions.MoveTo((cloud_x, cloud_y), 3) +\
+                      cocos.actions.CallFunc(self.remove, self.block[idx]) +\
+                      cocos.actions.CallFunc(self.add, new_batch) +\
+                      cocos.actions.MoveTo((2000, 1000), 3))
 
-            self.block[idx].do(cocos.actions.FadeOut(2) + cocos.actions.CallFunc(self.add, new_batch))
         self.block[idx] = new_batch
 
     def _get_sprite_drawing_coors(self, cell_x, cell_y, side):
