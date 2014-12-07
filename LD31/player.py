@@ -1,3 +1,4 @@
+import random
 import cocos, pyglet
 from pyglet.gl.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
 import maplayer, gamelogic
@@ -26,6 +27,9 @@ class Player(cocos.layer.Layer):
         
         self.schedule(self.update)
 
+        self.moving_sound1 = cocos.audio.pygame.mixer.Sound("sounds/snow1.wav")
+        self.moving_sound2 = cocos.audio.pygame.mixer.Sound("sounds/snow2.wav")
+
     def _get_drawing_coors(self):
         base_x = maplayer.MapLayer.SPRITE_SIZE * self.cell_x
         base_y = maplayer.MapLayer.SPRITE_SIZE * self.cell_y
@@ -50,6 +54,7 @@ class Player(cocos.layer.Layer):
             self.cell_x += 1
         else:
             return
+        random.choice([self.moving_sound1, self.moving_sound2]).play()
 
         self.moving = True
         self.sprite.do(cocos.actions.MoveTo(self._get_drawing_coors(), 0.2) + cocos.actions.CallFunc(self.stopped_moving))

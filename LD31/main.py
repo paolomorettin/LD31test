@@ -6,6 +6,14 @@ import pyglet
 
 if __name__ == "__main__":
     cocos.director.director.init(width=800, height=600)
+    cocos.audio.pygame.mixer.init()
+
+    try:
+        cocos.audio.pygame.music.load("sounds/music.wav")
+        cocos.audio.pygame.music.play(-1)
+    except Error:
+        print "Unable to play music"
+
     game = gamelogic.Game.instance()
     game.load_from("level.dat")
     viewer = maplayer.MapLayer()
