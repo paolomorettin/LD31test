@@ -70,6 +70,9 @@ class Game(object):
         c.wall[DIRECTION_LEFT] =  self.matrix[(x*2+0, y*2+1)]
         return c
 
+    def get_block_coords(self, idx):
+        return 0, 26, 0, 20
+
     def enter_cell(self,x,y):
         return
         # called when player enters a cell. May trigger some changes over the map.

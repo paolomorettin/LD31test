@@ -5,10 +5,36 @@ class MapLayer(cocos.layer.ColorLayer):
     SPRITE_SIZE = 30
     WALL_SIZE = 2
 
+    BLOCK_NEIGHBOUR = [{1, 3}, {0, 2, 4}, {1, 5},
+                       {0, 4}, {1, 3, 5}, {2, 4}]
+
     def __init__(self):
         super(MapLayer, self).__init__(255, 255, 255, 255)
         self.game = gamelogic.Game.instance()
-        self.update_view(0, 0, gamelogic.MAPSIZE[0], gamelogic.MAPSIZE[1])
+        self.block = [None] * 6
+        for idx, b in enumerate(self.block):
+            self.update(idx, animation=False)
+
+    def update(self, idx, animation=False):
+        new_batch = cocos.batch.BatchNode()
+        startx, endx, starty, endy = self.game.get_block_coords(idx)
+        for x in range(startx, endx):
+            for y in range(starty, endy):
+                cell = self.game.get_cell(x, y)
+                for side in range(4):
+                    if cell.wall[side] == 1:
+                        wall = cocos.sprite.Sprite("img/wall.png")
+                        if side == gamelogic.DIRECTION_UP or side == gamelogic.DIRECTION_DOWN:
+                            wall.rotation = 90
+                        wall.position = self._get_sprite_drawing_coors(x, y, side)
+                        new_batch.add(wall)
+        if not animation:
+            if self.block[idx]:
+                self.remove(self.block[idx])
+            self.add(new_batch)
+        else:
+            self.block[idx].do(cocos.actions.FadeOut(2) + cocos.actions.CallFunc(self.add, new_batch))
+        self.block[idx] = new_batch
 
     def _get_sprite_drawing_coors(self, cell_x, cell_y, side):
         base_x = cell_x * MapLayer.SPRITE_SIZE
@@ -32,33 +58,6 @@ class MapLayer(cocos.layer.ColorLayer):
 
         offset = MapLayer.SPRITE_SIZE / 2
         return base_x + offset, base_y + offset
-
-    def update_view(self, startx, starty, endx, endy):
-        """
-        Redraws a portion of the screen
-
-        :param startx:
-        :param starty:
-        :param endx:
-        :param endy:
-        :return:
-        """
-        self.batchnode = cocos.batch.BatchNode()
-        print "updating map"
-        for x in range(startx, endx):
-            for y in range(starty, endy):
-                cell = self.game.get_cell(x, y)
-                for side in range(4):
-                    if cell.wall[side] == 1:
-                        wall = cocos.sprite.Sprite("img/wall.png")
-                        if side == gamelogic.DIRECTION_UP or side == gamelogic.DIRECTION_DOWN:
-                            wall.rotation = 90
-                        wall.position = self._get_sprite_drawing_coors(x, y, side)
-                        self.batchnode.add(wall)
-
-        self.add(self.batchnode)
-        self.batchnode.do(cocos.actions.MoveTo((50,50), 5) + cocos.actions.MoveTo((-50,-50), 5))
-        self.do(cocos.actions.MoveTo((0,0), 5)+cocos.actions.FadeOutBLTiles((32,32),5))
 
 if __name__ == "__main__":
     import sys
