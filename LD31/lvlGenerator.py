@@ -186,8 +186,8 @@ def firstLevel(size) :
     
     return l
 
-if __name__ == '__main__' :
-
+def do_it_now() :
+    
     game_data = GameMapData()
 
     # LOVELY HARDCODED DATA
@@ -229,6 +229,10 @@ if __name__ == '__main__' :
 
     game_data.save("level.dat")
 
+
+
+if __name__ == '__main__' :
+    do_it_now()
 
 
 
