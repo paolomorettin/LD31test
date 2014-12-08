@@ -6,7 +6,7 @@ import pyglet
 from splashes import InitialSplashScreen
 
 if __name__ == "__main__":
-    cocos.director.director.init(width=800, height=600)
+    cocos.director.director.init(width=780, height=600)
     cocos.audio.pygame.mixer.init()
 
     game = gamelogic.Game.instance()
