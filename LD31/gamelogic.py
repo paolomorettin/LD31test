@@ -49,6 +49,7 @@ class Game(object):
         self.maplayer = None
         self.keystate = None
         self.player = None
+        self.enemies = set()
 
     def load_from(self, fname):
         # loads from the specified filename
@@ -72,8 +73,8 @@ class Game(object):
         return c
 
     def get_cell_near_player(self):
-        x_coor = random.randint(self.player.cell_x - 10, self.player.cell_x + 10)
-        y_coor = random.randint(self.player.cell_y - 10, self.player.cell_y + 10)
+        x_coor = random.randint(self.player.cell_x - 5, self.player.cell_x + 5)
+        y_coor = random.randint(self.player.cell_y - 5, self.player.cell_y + 5)
         if x_coor < 0: x_coor = 0
         elif x_coor > MAPSIZE[0]-1: x_coor = MAPSIZE[0]-1
         if y_coor < 0: y_coor = 0
@@ -96,6 +97,24 @@ class Game(object):
             if x >= x1 and y >= y1 and x <= x2 and y <= y2:
                 return i
         return None # WTF?
+
+    def get_distance(self, pos1, pos2):
+        x_dis = abs(pos1[0] - pos2[0])
+        y_dis = abs(pos1[1] - pos2[1])
+        return x_dis + y_dis
+
+    def kill(self, position):
+        if self.get_distance(position, self.player.sprite.position) <= 90:
+            self.die()
+            return
+        dead_enemies = set()
+        for enemy in self.enemies:
+            if self.get_distance(position, enemy.sprite.position) <= 90:
+                print "Your enemy was wandering too close to that nuke"
+                self.maplayer.remove(enemy)
+                dead_enemies.add(enemy)
+        self.enemies -= dead_enemies
+
 
     def enter_cell(self,xc,yc):
         # called when player enters a cell. May trigger some changes over the map.

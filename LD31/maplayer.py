@@ -43,6 +43,7 @@ class MapLayer(cocos.layer.Layer):
         explosion = self.__load_sprite("img/explosion.gif")
         explosion.position = bomb.position
         self.add(explosion)
+        self.game.kill(bomb.position)
 
     def update(self, animation=True):
         """
@@ -149,8 +150,10 @@ class MapLayer(cocos.layer.Layer):
     
     def add_enemies(self):
         for idx in range(2):
-            self.add(enemy.Enemy([random.randint(0, gamelogic.MAPSIZE[0]-1),
-                                  random.randint(0, gamelogic.MAPSIZE[1]-1)]))
+            black_guy = enemy.Enemy([random.randint(0, gamelogic.MAPSIZE[0]-1),
+                                     random.randint(0, gamelogic.MAPSIZE[1]-1)])
+            self.game.enemies.add(black_guy)
+            self.add(black_guy)
 
 class Storm(cocos.sprite.Sprite):
     def __init__(self, maplayer):
