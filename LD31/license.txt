@@ -1,0 +1,35 @@
+################# Game and Art ###############
+This game is released with a Creative Commons - Attribution license.
+See the details here: https://creativecommons.org/licenses/by/4.0
+
+This license covers only the files which we created:
+- all the python files in this directory, (present only in the source release)
+- all the files in the "img" directory.
+
+############## External libraries ################
+In order to run the game easily we have included the source code
+of the following libraries, which have a separate license and 
+for which we have no copyright:
+- cocos2d library (everything in the "cocos" directory) 
+  See http://python.cocos2d.org/index.html for the license.
+- pyglet library
+  See http://www.pyglet.org/ for the license
+
+- In the windows release we also include some binaries
+  from the pygame library, for the audio:
+  libogg.dll, libvorbis.dll, libvorbisfile.dll
+  mikmod.dll, SDL*.dll smpeg.dll
+  See http://www.pygame.org/ for the details
+- In the windows release we distribute also some parts of the python interpreter and py2exe.
+  Please see http://www.py2exe.org/ and https://www.python.org/ for the details about their license.
+
+
+################### Audio ###################
+- The splashscreen music is based upon a recording of monkeys screaming by TeamMasaka.
+  Full recording can be downloaded from: http://freesound.org/people/TeamMasaka/sounds/197431/
+- Files snow1.wav and snow2.wav are based upon Footstep_Snow4 by iujhu, freely available on freeso00und.org
+- File growl.wav is published by Nmb910, freely available on freesound.org
+- File explosion.wav is published by harpoyume, freely available on freesound.org
+- File mystery.wav is published by hamlett, freely available on freesound.org
+- File bomb_drop.wav is published by ice9ine, freely available on freesound.org
+- Background music is based upon DT3 by Robert del Naja, provided under the terms of the Creative Commons ‘NonCommercial-ShareAlike 4.0 International‘ license. That means you’re free to do whatever, as long as give credit, and what you make is free (i.e. non commercial).
