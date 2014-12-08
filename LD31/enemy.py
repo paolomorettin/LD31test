@@ -94,7 +94,7 @@ class Enemy(cocos.layer.Layer):
             self.cell_x += 1
             self.sprite.image = self.images[gamelogic.DIRECTION_RIGHT]
 
-        if random.randint(0,50) == 0 :
+        if random.randint(0,31) == 0 :
             self.growl_sound.play()
 
         self.moving = True
@@ -107,7 +107,7 @@ class Enemy(cocos.layer.Layer):
 
 
 
-
+        
 
 
 
