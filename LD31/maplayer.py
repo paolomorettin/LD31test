@@ -12,7 +12,7 @@ class MapLayer(cocos.layer.Layer):
         super(MapLayer, self).__init__()
         self.game = gamelogic.Game.instance()
 
-        self.back = self.__load_sprite("img/back.png")
+        self.back = self.game.load_sprite("img/back.png")
         self.back.position = (400, 300)
         self.add(self.back)
 
@@ -37,14 +37,6 @@ class MapLayer(cocos.layer.Layer):
         nuke.launch(launch_pos)
         print "Bombing @ " + str(launch_pos)
 
-    def explode(self, timedelta, bomb):
-        bomb.sound.play()
-        self.remove(bomb)
-        explosion = self.__load_sprite("img/explosion.gif")
-        explosion.position = bomb.position
-        self.add(explosion)
-        self.game.kill(bomb.position)
-
     def update(self, animation=True):
         """
         :type block_list:   list of int
@@ -52,7 +44,7 @@ class MapLayer(cocos.layer.Layer):
         :return:
         """
         self.unschedule(self.bombing)
-        self.schedule_interval(self.bombing, 20)
+        self.schedule_interval(self.bombing, 5)
 
         if animation:
             if self.storm is None:
@@ -67,7 +59,7 @@ class MapLayer(cocos.layer.Layer):
             for y in range(gamelogic.MAPSIZE[1]):
                 cell = self.game.get_cell(x, y)
                 if cell.type == gamelogic.CELLTYPE_END:
-                    end_flag = self.__load_sprite("img/end.png")
+                    end_flag = self.game.load_sprite("img/end.png")
                     x_pos = x * MapLayer.SPRITE_SIZE + MapLayer.SPRITE_SIZE / 2
                     y_pos = y * MapLayer.SPRITE_SIZE + MapLayer.SPRITE_SIZE / 2
                     end_flag.position = x_pos, y_pos
@@ -80,31 +72,25 @@ class MapLayer(cocos.layer.Layer):
         self.add(new_batch)
         self.map = new_batch
 
-    def __load_sprite(self, path):
-        img = pyglet.resource.image(path)
-        glTexParameteri(img.texture.target, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        glTexParameteri(img.texture.target, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        return cocos.sprite.Sprite(img)
-
     def __wall_top(self, x, y):
-        wall = self.__load_sprite("img/ice_mid2.png")
+        wall = self.game.load_sprite("img/ice_mid2.png")
         wall.rotation = 90
         wall.position = self._get_sprite_drawing_coors(x, y, gamelogic.DIRECTION_UP)
         return wall
 
     def __wall_bottom(self, x, y):
-        wall = self.__load_sprite("img/ice_mid.png")
+        wall = self.game.load_sprite("img/ice_mid.png")
         wall.rotation = 90
         wall.position = self._get_sprite_drawing_coors(x, y, gamelogic.DIRECTION_DOWN)
         return wall
 
     def __wall_left(self, x, y):
-        wall = self.__load_sprite("img/ice_mid2.png")
+        wall = self.game.load_sprite("img/ice_mid2.png")
         wall.position = self._get_sprite_drawing_coors(x, y, gamelogic.DIRECTION_LEFT)
         return wall
 
     def __wall_right(self, x, y):
-        wall = self.__load_sprite("img/ice_mid.png")
+        wall = self.game.load_sprite("img/ice_mid.png")
         wall.position = self._get_sprite_drawing_coors(x, y, gamelogic.DIRECTION_RIGHT)
         return wall
 

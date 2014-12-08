@@ -1,4 +1,6 @@
 from datastructures import GameMapData
+import pyglet
+from pyglet.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
 import maplayer
 import player
 import cocos
@@ -170,3 +172,9 @@ class Game(object):
         if self.maplayer is not None:
             self.maplayer.update()
         pass
+
+    def load_sprite(self, path):
+        img = pyglet.resource.image(path)
+        glTexParameteri(img.texture.target, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glTexParameteri(img.texture.target, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        return cocos.sprite.Sprite(img)
