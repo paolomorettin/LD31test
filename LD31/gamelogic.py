@@ -71,6 +71,15 @@ class Game(object):
         c.wall[DIRECTION_LEFT] =  self.matrix[(x*2+0, y*2+1)]
         return c
 
+    def get_cell_near_player(self):
+        x_coor = random.randint(self.player.cell_x - 10, self.player.cell_x + 10)
+        y_coor = random.randint(self.player.cell_y - 10, self.player.cell_y + 10)
+        if x_coor < 0: x_coor = 0
+        elif x_coor > MAPSIZE[0]-1: x_coor = MAPSIZE[0]-1
+        if y_coor < 0: y_coor = 0
+        elif y_coor > MAPSIZE[1]-1: y_coor = MAPSIZE[1]-1
+        return x_coor, y_coor
+
     def get_random_cell(self):
         x_coor = random.randint(0, MAPSIZE[0]-1)
         y_coor = random.randint(0, MAPSIZE[1]-1)

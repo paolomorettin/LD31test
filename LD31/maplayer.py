@@ -33,7 +33,7 @@ class MapLayer(cocos.layer.Layer):
     def bombing(self, timedelta):
         nuke = bomb.Bomb()
         self.add(nuke)
-        launch_pos = self.game.get_random_cell()
+        launch_pos = self.game.get_cell_near_player()
         nuke.launch(launch_pos)
         print "Bombing @ " + str(launch_pos)
 
