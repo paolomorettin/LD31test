@@ -227,7 +227,7 @@ def do_it_now() :
         game_data.levels.append(l)
 
 
-        return game_data
+    return game_data
 
 
 

@@ -58,7 +58,6 @@ class Game(object):
         # loads from the specified filename
         #self._all_data = GameMapData.load(fname)
         self._all_data = lvlGenerator.do_it_now()
-        print "cazzoooo"
         
         self.matrix = self._all_data.levels[0].matrix.copy()
         self.triggers = self._all_data.levels[0].triggers.copy()
