@@ -38,6 +38,7 @@ class MapLayer(cocos.layer.Layer):
         print "Bombing @ " + str(launch_pos)
 
     def explode(self, timedelta, bomb):
+        bomb.sound.play()
         self.remove(bomb)
         explosion = self.__load_sprite("img/explosion.gif")
         explosion.position = bomb.position
@@ -50,7 +51,7 @@ class MapLayer(cocos.layer.Layer):
         :return:
         """
         self.unschedule(self.bombing)
-        self.schedule_interval(self.bombing, 20 - self.game.get_cell(0, 0).style * 10)
+        self.schedule_interval(self.bombing, 20)
 
         if animation:
             if self.storm is None:

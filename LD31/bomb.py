@@ -7,8 +7,8 @@ class Bomb(cocos.sprite.Sprite):
 
     def __init__(self) :
                                 
-        image = pyglet.resource.image("img/fire.gif")
-        #self.explosion_sound = cocos.audio.pygame.mixer.Sound("sounds/explosion.wav")
+        image = pyglet.resource.image("img/bomb.png")
+        self.sound = cocos.audio.pygame.mixer.Sound("sounds/explosion.wav")
        
         glTexParameteri(image.texture.target,
                         GL_TEXTURE_MAG_FILTER, GL_NEAREST)
