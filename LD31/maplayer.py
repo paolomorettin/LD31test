@@ -2,7 +2,7 @@ import cocos
 import pyglet
 from pyglet.gl.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
 import gamelogic
-import random, enemy
+import random, enemy, bomb
 
 class MapLayer(cocos.layer.Layer):
     SPRITE_SIZE = 30
@@ -30,12 +30,28 @@ class MapLayer(cocos.layer.Layer):
     def update_blocks(self, block_list):
         self.update(True)
 
+    def bombing(self, timedelta):
+        nuke = bomb.Bomb()
+        self.add(nuke)
+        launch_pos = self.game.get_random_cell()
+        nuke.launch(launch_pos)
+        print "Bombing @ " + str(launch_pos)
+
+    def explode(self, timedelta, bomb):
+        self.remove(bomb)
+        explosion = self.__load_sprite("img/explosion.gif")
+        explosion.position = bomb.position
+        self.add(explosion)
+
     def update(self, animation=True):
         """
         :type block_list:   list of int
         :param block_list:  IDs of the blocks which need to be updated
         :return:
         """
+        self.unschedule(self.bombing)
+        self.schedule_interval(self.bombing, 20 - self.game.get_cell(0, 0).style * 10)
+
         if animation:
             if self.storm is None:
                 self.storm = Storm(self)
