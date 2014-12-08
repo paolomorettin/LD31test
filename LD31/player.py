@@ -10,14 +10,18 @@ class Player(cocos.layer.Layer):
     def __init__(self):
         #super(Player, self).__init__(255,255,255,255)
         super(Player, self).__init__()
-                                
-        image = pyglet.resource.image("img/player.png")
-       
-        glTexParameteri(image.texture.target,
-                        GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        glTexParameteri(image.texture.target,
-                        GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        self.sprite = cocos.sprite.Sprite(image)
+
+        self.images = []
+        self.images.append(pyglet.resource.image("img/player_up.png"))
+        self.images.append(pyglet.resource.image("img/player_left.png"))
+        self.images.append(pyglet.resource.image("img/player_down.png"))
+        self.images.append(pyglet.resource.image("img/player_right.png"))
+        for img in self.images :
+            glTexParameteri(img.texture.target, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+            glTexParameteri(img.texture.target, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        
+        self.sprite = cocos.sprite.Sprite(self.images[gamelogic.DIRECTION_DOWN])
+
         (self.cell_x,self.cell_y) = gamelogic.Game.instance().get_start_point()
         self.sprite.position = self._get_drawing_coors()
         self.add(self.sprite)
@@ -51,12 +55,16 @@ class Player(cocos.layer.Layer):
 
         if keystate[key.LEFT] and self._movement_allowed(gamelogic.DIRECTION_LEFT):
             self.cell_x -= 1
+            self.sprite.image = self.images[gamelogic.DIRECTION_LEFT]
         elif keystate[key.UP] and self._movement_allowed(gamelogic.DIRECTION_UP):
             self.cell_y += 1
+            self.sprite.image = self.images[gamelogic.DIRECTION_UP]
         elif keystate[key.DOWN] and self._movement_allowed(gamelogic.DIRECTION_DOWN):
             self.cell_y -= 1
+            self.sprite.image = self.images[gamelogic.DIRECTION_DOWN]
         elif keystate[key.RIGHT] and self._movement_allowed(gamelogic.DIRECTION_RIGHT):
             self.cell_x += 1
+            self.sprite.image = self.images[gamelogic.DIRECTION_RIGHT]
         else:
             if self.cheating:
                 if keystate[key.LEFT]:
