@@ -106,9 +106,6 @@ class Game(object):
         return x_dis + y_dis
 
     def kill(self, position):
-        if self.get_distance(position, self.player.sprite.position) <= 90:
-            self.die()
-            return
         dead_enemies = set()
         for enemy in self.enemies:
             if self.get_distance(position, enemy.sprite.position) <= 90:
@@ -117,6 +114,9 @@ class Game(object):
                 dead_enemies.add(enemy)
         self.enemies -= dead_enemies
 
+    def is_player_in_range(self, position):
+        if self.get_distance(position, self.player.sprite.position) <= 90:
+            return True
 
     def enter_cell(self,xc,yc):
         # called when player enters a cell. May trigger some changes over the map.
