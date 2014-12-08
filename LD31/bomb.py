@@ -10,7 +10,8 @@ class Bomb(cocos.sprite.Sprite):
     def __init__(self) :
                                 
         image = pyglet.resource.image("img/bomb.png")
-        self.sound = cocos.audio.pygame.mixer.Sound("sounds/explosion.wav")
+        self.drop_sound = cocos.audio.pygame.mixer.Sound("sounds/bomb_drop.wav")
+        self.explosion_sound = cocos.audio.pygame.mixer.Sound("sounds/explosion.wav")
        
         glTexParameteri(image.texture.target,
                         GL_TEXTURE_MAG_FILTER, GL_NEAREST)
@@ -25,11 +26,12 @@ class Bomb(cocos.sprite.Sprite):
         target_y = target[1] * 30 + 15
         self.position = target_x, 700
         self.do(cocos.actions.MoveTo((target_x, target_y), 1))
+        self.drop_sound.play()
         self.schedule_interval(self.explode, 5)
 
 
     def explode(self, timedelta):
-        self.sound.play()
+        self.explosion_sound.play()
         self.game.kill(self.position)
         for i in range(5):
             pos = self.position

@@ -5,6 +5,6 @@ Files snow1.wav and snow2.wav are based upon Footstep_Snow4 by iujhu, freely ava
 File growl.wav is published by Nmb910, freely available on freesound.org
 File explosion.wav is published by harpoyume, freely available on freesound.org
 File mystery.wav is published by hamlett, freely available on freesound.org
-
+File bomb_drop.wav is published by ice9ine, freely available on freesound.org
 
 Background music is based upon DT3 by Robert del Naja, provided under the terms of the Creative Commons ‘NonCommercial-ShareAlike 4.0 International‘ license. That means you’re free to do whatever, as long as give credit, and what you make is free (i.e. non commercial).

@@ -44,7 +44,7 @@ class MapLayer(cocos.layer.Layer):
         :return:
         """
         self.unschedule(self.bombing)
-        self.schedule_interval(self.bombing, 20)
+        self.schedule_interval(self.bombing, 10)
 
         if animation:
             if self.storm is None:
