@@ -57,7 +57,7 @@ class BombExplosion(cocos.sprite.Sprite):
     def pre_init(self):
         BombExplosion.animation = pyglet.image.load_animation('img/explosion.gif')
         BombExplosion.bin = pyglet.image.atlas.TextureBin()
-        BombExplosion.animation.add_to_texture_bin(bin)
+        BombExplosion.animation.add_to_texture_bin(BombExplosion.bin)
 
     def __init__(self, pos, game, killplayer=False):
         if not BombExplosion.animation: self.pre_init()
