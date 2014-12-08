@@ -2,7 +2,7 @@ import cocos
 import pyglet
 from pyglet.gl.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
 import gamelogic
-import random, enemy, bomb
+import random, enemy, bomb, sound
 
 class MapLayer(cocos.layer.Layer):
     SPRITE_SIZE = 30
@@ -11,6 +11,7 @@ class MapLayer(cocos.layer.Layer):
     def __init__(self):
         super(MapLayer, self).__init__()
         self.game = gamelogic.Game.instance()
+        self.sounds = sound.SoundManager.instance()
 
         self.back = self.game.load_sprite("img/back.png")
         self.back.position = (400, 300)
@@ -24,8 +25,6 @@ class MapLayer(cocos.layer.Layer):
         self.map = cocos.batch.BatchNode()
         self.add(self.map)
         self.update(False)
-
-        self.mystery_sound = cocos.audio.pygame.mixer.Sound("sounds/mystery.wav")
 
     def update_blocks(self, block_list):
         self.update(True)
@@ -52,7 +51,7 @@ class MapLayer(cocos.layer.Layer):
                 self.parent.add(self.storm, z=1)
                 self.storm_started()
             self.storm.activate()
-            self.mystery_sound.play()
+            self.sounds.play(sound.MISTERY)
             return
         new_batch = cocos.batch.BatchNode()
         for x in range(gamelogic.MAPSIZE[0]):

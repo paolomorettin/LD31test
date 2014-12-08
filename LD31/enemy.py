@@ -2,15 +2,14 @@ import random
 import cocos, pyglet
 from pyglet.gl.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
 import maplayer, gamelogic
-from pyglet.window import key
+import sound
 
 class Enemy(cocos.layer.Layer):
     PLAYER_SIZE = 26
 
     def __init__(self, position) :
         super(Enemy, self).__init__()
-                                
-        self.growl_sound = cocos.audio.pygame.mixer.Sound("sounds/growl1.wav")
+        self.sounds = sound.SoundManager.instance()
 
         self.images = []
         self.images.append(pyglet.resource.image("img/enemy_up.png"))
@@ -95,7 +94,7 @@ class Enemy(cocos.layer.Layer):
             self.sprite.image = self.images[gamelogic.DIRECTION_RIGHT]
 
         if random.randint(0,31) == 0 :
-            self.growl_sound.play()
+            self.sounds.play(sound.GROWL)
 
         self.moving = True
         self.sprite.do(cocos.actions.MoveTo(self._get_drawing_coors(), 0.5) + cocos.actions.CallFunc(self.stopped_moving))

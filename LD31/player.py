@@ -3,6 +3,7 @@ import cocos, pyglet
 from pyglet.gl.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
 import maplayer, gamelogic
 from pyglet.window import key
+import sound
 
 class Player(cocos.layer.Layer):
     PLAYER_SIZE = 26
@@ -11,6 +12,7 @@ class Player(cocos.layer.Layer):
         #super(Player, self).__init__(255,255,255,255)
         super(Player, self).__init__()
 
+        self.sound = sound.SoundManager.instance()
         self.images = []
         self.images.append(pyglet.resource.image("img/player_up.png"))
         self.images.append(pyglet.resource.image("img/player_left.png"))
@@ -30,11 +32,7 @@ class Player(cocos.layer.Layer):
 
         self.cheating = False
         self.controllable = True
-        
         self.schedule(self.update)
-
-        self.moving_sound1 = cocos.audio.pygame.mixer.Sound("sounds/snow1.wav")
-        self.moving_sound2 = cocos.audio.pygame.mixer.Sound("sounds/snow2.wav")
 
     def _get_drawing_coors(self):
         base_x = maplayer.MapLayer.SPRITE_SIZE * self.cell_x
@@ -79,7 +77,7 @@ class Player(cocos.layer.Layer):
                     return
             else:
                 return
-        random.choice([self.moving_sound1, self.moving_sound2]).play()
+        self.sound.play(sound.STEP)
         print "[player] moving mowing moving to ", self.cell_x, ",",self.cell_y
 
         self.moving = True
