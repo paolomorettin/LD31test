@@ -10,14 +10,18 @@ class Enemy(cocos.layer.Layer):
     def __init__(self, position) :
         super(Enemy, self).__init__()
                                 
-        image = pyglet.resource.image("img/enemy.png")
         self.growl_sound = cocos.audio.pygame.mixer.Sound("sounds/growl1.wav")
-       
-        glTexParameteri(image.texture.target,
-                        GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        glTexParameteri(image.texture.target,
-                        GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        self.sprite = cocos.sprite.Sprite(image)
+
+        self.images = []
+        self.images.append(pyglet.resource.image("img/enemy_up.png"))
+        self.images.append(pyglet.resource.image("img/enemy_left.png"))
+        self.images.append(pyglet.resource.image("img/enemy_down.png"))
+        self.images.append(pyglet.resource.image("img/enemy_right.png"))
+        for img in self.images :
+            glTexParameteri(img.texture.target, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+            glTexParameteri(img.texture.target, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        
+        self.sprite = cocos.sprite.Sprite(self.images[gamelogic.DIRECTION_DOWN])
         (self.cell_x,self.cell_y) = position
         self.sprite.position = self._get_drawing_coors()
         self.add(self.sprite)
@@ -79,12 +83,16 @@ class Enemy(cocos.layer.Layer):
 
         if ran_move == gamelogic.DIRECTION_LEFT:
             self.cell_x -= 1
+            self.sprite.image = self.images[gamelogic.DIRECTION_LEFT]
         elif ran_move == gamelogic.DIRECTION_UP:
             self.cell_y += 1
+            self.sprite.image = self.images[gamelogic.DIRECTION_UP]
         elif ran_move == gamelogic.DIRECTION_DOWN:
             self.cell_y -= 1
+            self.sprite.image = self.images[gamelogic.DIRECTION_DOWN]
         elif ran_move == gamelogic.DIRECTION_RIGHT:
             self.cell_x += 1
+            self.sprite.image = self.images[gamelogic.DIRECTION_RIGHT]
 
         if random.randint(0,50) == 0 :
             self.growl_sound.play()
