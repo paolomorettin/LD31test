@@ -79,8 +79,10 @@ class Game(object):
         return c
 
     def get_cell_near_player(self):
-        x_coor = random.randint(self.player.cell_x - 5, self.player.cell_x + 5)
-        y_coor = random.randint(self.player.cell_y - 5, self.player.cell_y + 5)
+        #x_coor = random.randint(self.player.cell_x - 5, self.player.cell_x + 5)
+        #y_coor = random.randint(self.player.cell_y - 5, self.player.cell_y + 5)
+        x_coor = random.randint(self.player.cell_x - 3, self.player.cell_x + 3)
+        y_coor = random.randint(self.player.cell_y - 3, self.player.cell_y + 3)
         if x_coor < 0: x_coor = 0
         elif x_coor > MAPSIZE[0]-1: x_coor = MAPSIZE[0]-1
         if y_coor < 0: y_coor = 0
