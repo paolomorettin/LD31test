@@ -51,13 +51,16 @@ class Bomb(cocos.sprite.Sprite):
 
 
 class BombExplosion(cocos.sprite.Sprite):
-    # yes, it's doing what you are thinking.
-    animation = pyglet.image.load_animation('img/explosion.gif')
-    bin = pyglet.image.atlas.TextureBin()
-    animation.add_to_texture_bin(bin)
+    animation = None
+    bin = None
 
+    def pre_init(self):
+        BombExplosion.animation = pyglet.image.load_animation('img/explosion.gif')
+        BombExplosion.bin = pyglet.image.atlas.TextureBin()
+        BombExplosion.animation.add_to_texture_bin(bin)
 
     def __init__(self, pos, game, killplayer=False):
+        if not BombExplosion.animation: self.pre_init()
         super(BombExplosion, self).__init__(BombExplosion.animation)
         self.position = pos
         self.scale = 1.5
