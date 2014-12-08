@@ -11,7 +11,7 @@ if __name__ == "__main__":
     cocos.audio.pygame.mixer.init()
 
     game = gamelogic.Game.instance()
-    lvlGenerator.do_it_now()
+
     game.load_from("level.dat")
     viewer = maplayer.MapLayer()
     game.maplayer = viewer

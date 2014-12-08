@@ -7,6 +7,7 @@ import cocos
 import itertools
 import enemy, random
 from splashes import DeathScreen, WinScreen
+import lvlGenerator
 
 # directions (enum)
 DIRECTION_UP, DIRECTION_LEFT, DIRECTION_DOWN, DIRECTION_RIGHT = range(4)
@@ -55,7 +56,10 @@ class Game(object):
 
     def load_from(self, fname):
         # loads from the specified filename
-        self._all_data = GameMapData.load(fname)
+        #self._all_data = GameMapData.load(fname)
+        self._all_data = lvlGenerator.do_it_now()
+        print "cazzoooo"
+        
         self.matrix = self._all_data.levels[0].matrix.copy()
         self.triggers = self._all_data.levels[0].triggers.copy()
         self.refresh_level()

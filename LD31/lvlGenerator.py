@@ -227,12 +227,12 @@ def do_it_now() :
         game_data.levels.append(l)
 
 
-    game_data.save("level.dat")
+        return game_data
 
 
 
 if __name__ == '__main__' :
-    do_it_now()
+    do_it_now().save("level.dat")
 
 
 
