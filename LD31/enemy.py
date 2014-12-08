@@ -90,7 +90,7 @@ class Enemy(cocos.layer.Layer):
             self.growl_sound.play()
 
         self.moving = True
-        self.sprite.do(cocos.actions.MoveTo(self._get_drawing_coors(), 0.2) + cocos.actions.CallFunc(self.stopped_moving))
+        self.sprite.do(cocos.actions.MoveTo(self._get_drawing_coors(), 0.5) + cocos.actions.CallFunc(self.stopped_moving))
         if self.cell_x == self.game.player.cell_x and self.cell_y == self.game.player.cell_y:
             self.game.die()
 
