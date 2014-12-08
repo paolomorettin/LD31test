@@ -2,7 +2,7 @@ from random import shuffle
 from datastructures import *
 
 class Graph :
-    def __init__(self,size,start_point,end_point,min_steps=1,block_to_keep=None,distance=0.5) :
+    def __init__(self,size,start_point,end_point,min_steps=1,block_to_keep=None,distance=0.75) :
 
         self.start_point = start_point
         self.end_point = end_point
