@@ -36,10 +36,12 @@ class SoundManager(object):
         return SoundManager.__inst
 
     def play_music(self):
-        cocos.audio.pygame.music.play(-1)
+        if self.initialized:
+            cocos.audio.pygame.music.play(-1)
 
     def play(self, sound):
         if not self.initialized:
             print "SOUND ERROR: Unable to play sounds"
+            return
         random.choice(self.sounds[sound]).play()
 
