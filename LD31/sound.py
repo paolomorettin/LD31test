@@ -11,9 +11,10 @@ class SoundManager(object):
         try:
             cocos.audio.pygame.mixer.init()
 
+            self.sounds = [None] * 6
+            self.music = None
             self.music = cocos.audio.pygame.music.load("sounds/music.wav")
 
-            self.sounds = [None] * 6
             self.sounds[STEP] = [cocos.audio.pygame.mixer.Sound("sounds/snow1.wav"),
                                 cocos.audio.pygame.mixer.Sound("sounds/snow2.wav")]
             self.sounds[FALLING_BOMB] = [cocos.audio.pygame.mixer.Sound("sounds/bomb_drop.wav")]
