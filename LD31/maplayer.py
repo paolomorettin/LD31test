@@ -135,8 +135,7 @@ class MapLayer(cocos.layer.Layer):
     
     def add_enemies(self):
         for idx in range(10):
-            black_guy = enemy.Enemy([random.randint(0, gamelogic.MAPSIZE[0]-1),
-                                     random.randint(0, gamelogic.MAPSIZE[1]-1)])
+            black_guy = enemy.Enemy(self.game.get_spawn_position())
             self.game.enemies.add(black_guy)
             self.add(black_guy)
 

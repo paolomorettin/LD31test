@@ -93,6 +93,12 @@ class Game(object):
         y_coor = random.randint(0, MAPSIZE[1]-1)
         return x_coor, y_coor
 
+    def get_spawn_position(self):
+        pos = self.player.sprite.position
+        while self.get_distance(pos, self.player.sprite.position) < 4:
+            pos = self.get_random_cell()
+        return pos
+
     def get_block_coords(self, idx):
         data = [(0,8,0,9),(9,16,0,9),(17,25,0,9),(0,8,10,19),(9,16,10,19),(17,25,10,19)]
         x1, x2, y1, y2 = data[idx]
